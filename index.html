@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kalshi Extension — Desktop Preview</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<style>
+  /*
+    Font source: C:\Users\joann\Project1\Fonts\Inter.zip\static
+    For Chrome extension, fonts are loaded from local extension directory.
+    For preview fallback, Google Fonts CDN is imported below.
+  */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: local('Inter Regular'), local('Inter-Regular'),
+         url('fonts/Inter-Regular.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 500;
+    font-display: swap;
+    src: local('Inter Medium'), local('Inter-Medium'),
+         url('fonts/Inter-Medium.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 600;
+    font-display: swap;
+    src: local('Inter SemiBold'), local('Inter-SemiBold'),
+         url('fonts/Inter-SemiBold.ttf') format('truetype');
+  }
+  @font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: local('Inter Bold'), local('Inter-Bold'),
+         url('fonts/Inter-Bold.ttf') format('truetype');
+  }
+  :root {
+    --kalshi-green: #00D296;
+    --kalshi-green-hover: #00b882;
+    --kalshi-dark: #1A1A1A;
+    --kalshi-green-light: #e5f8f0;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    width: 100%;
+    min-height: 100vh;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #111119;
+    color: #e0e0e0;
+    overflow-x: hidden;
+  }
+
+  /* ==========================================================
+     F1.COM SIMULATED PAGE — Full-width desktop layout
+     ========================================================== */
+
+  /* Top browser-style bar hint */
+  .sim-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 20px;
+    background: #0d0d14;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    font-size: 12px;
+    color: #555;
+  }
+  .sim-topbar-dots { display: flex; gap: 6px; }
+  .sim-topbar-dots span { width: 10px; height: 10px; border-radius: 50%; }
+  .sim-topbar-dots span:nth-child(1) { background: #ff5f57; }
+  .sim-topbar-dots span:nth-child(2) { background: #ffbd2e; }
+  .sim-topbar-dots span:nth-child(3) { background: #28c840; }
+  .sim-topbar-url {
+    flex: 1;
+    background: rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    color: #666;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  /* F1 Main Nav */
+  .sim-nav {
+    display: flex;
+    align-items: center;
+    padding: 0 40px;
+    background: #15151e;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    height: 52px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .sim-nav-logo {
+    font-weight: 900;
+    font-size: 28px;
+    color: #e10600;
+    font-style: italic;
+    letter-spacing: -1.5px;
+    margin-right: 40px;
+    flex-shrink: 0;
+  }
+  .sim-nav-links {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+  }
+  .sim-nav-links a {
+    color: #bbb;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 14px 14px;
+    transition: color 0.15s;
+    white-space: nowrap;
+  }
+  .sim-nav-links a:hover { color: #fff; }
+  .sim-nav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+  .sim-nav-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #888;
+    font-size: 14px;
+    cursor: pointer;
+  }
+
+  /* Sub-nav / Breadcrumb bar */
+  .sim-subnav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 40px;
+    background: #1a1a24;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .sim-subnav-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .sim-breadcrumb-item {
+    font-size: 13px;
+    color: #777;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .sim-breadcrumb-item .dot { color: #e10600; font-size: 8px; }
+  .sim-race-timer {
+    font-family: 'Inter', monospace;
+    font-size: 14px;
+    font-weight: 700;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .sim-race-timer span.label { font-style: italic; margin-right: 8px; }
+  .sim-race-timer span.num { color: #ccc; }
+  .sim-race-timer span.unit { color: #555; font-weight: 400; font-size: 11px; }
+  .sim-subnav-right {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .sim-tag-sponsor {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    color: #555;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  /* Main content area — two column desktop layout */
+  .sim-page {
+    display: flex;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 40px;
+    position: relative;
+  }
+
+  .sim-main {
+    flex: 1;
+    max-width: 820px;
+    padding: 28px 0 80px;
+    padding-right: 60px;
+  }
+
+  .sim-sidebar {
+    width: 380px;
+    flex-shrink: 0;
+    padding: 28px 0 80px;
+    position: relative;
+  }
+
+  /* Article tags */
+  .sim-tags {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 24px;
+  }
+  .sim-tags span {
+    padding: 6px 16px;
+    background: rgba(255,255,255,0.07);
+    border-radius: 4px;
+    font-size: 11px;
+    color: #aaa;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 600;
+  }
+
+  /* Article headline */
+  .sim-headline {
+    font-size: 40px;
+    font-weight: 900;
+    line-height: 1.08;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: -1px;
+    margin-bottom: 24px;
+  }
+
+  /* Article sub-text */
+  .sim-subhead {
+    font-size: 17px;
+    color: rgba(255,255,255,0.45);
+    line-height: 1.65;
+    margin-bottom: 16px;
+    max-width: 640px;
+  }
+  .sim-time {
+    font-size: 13px;
+    color: rgba(255,255,255,0.2);
+    margin-bottom: 32px;
+  }
+
+  /* Hero image placeholder */
+  .sim-hero {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 4px;
+    background:
+      linear-gradient(145deg, #16161f 0%, #1e1e30 35%, #222238 50%, #1a1a28 100%);
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 32px;
+  }
+  .sim-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(ellipse at 35% 55%, rgba(255,135,0,0.06) 0%, transparent 55%),
+      radial-gradient(ellipse at 65% 45%, rgba(220,0,0,0.04) 0%, transparent 45%);
+  }
+  .sim-hero-label {
+    position: absolute;
+    bottom: 16px;
+    left: 16px;
+    font-size: 11px;
+    color: rgba(255,255,255,0.15);
+    letter-spacing: 0.5px;
+  }
+
+  /* Fake article body text */
+  .sim-article-body p {
+    font-size: 15px;
+    color: rgba(255,255,255,0.35);
+    line-height: 1.75;
+    margin-bottom: 16px;
+    max-width: 640px;
+  }
+
+  /* Sidebar ad placeholder */
+  .sim-sidebar-ad {
+    width: 100%;
+    height: 250px;
+    background: rgba(255,255,255,0.02);
+    border: 1px solid rgba(255,255,255,0.04);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: rgba(255,255,255,0.1);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 320px;
+  }
+
+  /* ==========================================================
+     KALSHI WIDGET — Fixed overlay
+     ========================================================== */
+  #kalshi-ext-root {
+    position: fixed;
+    top: 12px;
+    right: 16px;
+    z-index: 2147483647;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    pointer-events: none;
+  }
+  #kalshi-ext-root > * { pointer-events: auto; }
+
+  /* ==========================================================
+     SCREEN 1 — Green collapsed card
+     Responsive: scales from 435px down to 280px
+     ========================================================== */
+  .kalshi-widget-collapsed {
+    width: 435px;
+    background: var(--kalshi-green);
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow:
+      0 8px 40px rgba(0, 0, 0, 0.2),
+      0 2px 8px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+  }
+
+  @keyframes kalshi-slideIn {
+    from { opacity: 0; transform: translateX(20px) scale(0.98); }
+    to { opacity: 1; transform: translateX(0) scale(1); }
+  }
+
+  /* Top section — Logo + Subtitle */
+  .kalshi-collapsed-top {
+    padding: 16px 42px 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .kalshi-collapsed-logo {
+    font-size: 30px;
+    font-weight: 900;
+    color: var(--kalshi-dark);
+    letter-spacing: -0.8px;
+    line-height: 1;
+  }
+
+  .kalshi-collapsed-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--kalshi-dark);
+    cursor: pointer;
+    user-select: none;
+    opacity: 0.75;
+  }
+
+  .kalshi-chevron-icon {
+    width: 14px;
+    height: 14px;
+    opacity: 0.7;
+    transition: transform 0.2s;
+    vertical-align: middle;
+  }
+
+  .kalshi-collapsed-subtitle:hover .kalshi-chevron-icon {
+    transform: translateY(1px);
+  }
+
+  /* Divider — #000 at 20% opacity */
+  .kalshi-collapsed-divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.2);
+    margin: 8px 20px;
+  }
+
+  /* Body — markets list + ellipsis side by side */
+  .kalshi-collapsed-body {
+    display: flex;
+    align-items: center;
+    padding: 0 20px 16px 20px;
+  }
+
+  /* Markets list — hugs content, doesn't stretch to fill */
+  .kalshi-collapsed-markets {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .kalshi-collapsed-market-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 0;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+    width: fit-content;
+  }
+
+  .kalshi-collapsed-market-item:hover {
+    opacity: 0.5;
+  }
+
+  .kalshi-collapsed-market-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 4px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .kalshi-avatar-img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+
+  .kalshi-collapsed-market-text {
+    white-space: nowrap;
+  }
+
+  .kalshi-collapsed-market-title {
+    font-size: 15px;
+    font-weight: 500;
+    color: var(--kalshi-dark);
+    line-height: 1.3;
+  }
+
+  /* Arrow icon — 4px gap from text */
+  .kalshi-arrow-icon {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+    margin-left: 0px;
+    opacity: 0.6;
+    transition: opacity 0.15s, transform 0.15s;
+  }
+
+  .kalshi-collapsed-market-item:hover .kalshi-arrow-icon {
+    opacity: 1;
+    transform: translateX(2px);
+  }
+
+  /* Ellipsis — pushed to far right, vertically centered */
+  .kalshi-collapsed-ellipsis {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    cursor: pointer;
+    margin-left: auto;
+    padding: 8px 0;
+    transition: opacity 0.15s;
+  }
+
+  .kalshi-collapsed-ellipsis:hover {
+    opacity: 0.7;
+  }
+
+  .kalshi-ellipsis-icon {
+    width: 16px;
+    height: auto;
+    opacity: 0.1;
+  }
+
+  /* Responsive breakpoints */
+  @media (max-width: 1200px) {
+    .kalshi-widget-collapsed {
+      width: min(435px, calc(100vw - 64px));
+    }
+    .kalshi-widget-expanded {
+      width: min(424px, calc(100vw - 48px));
+    }
+    #kalshi-ext-root { right: 16px; }
+    .sim-sidebar { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    .kalshi-widget-collapsed {
+      width: calc(100vw - 32px);
+    }
+    .kalshi-widget-expanded {
+      width: calc(100vw - 32px);
+    }
+    #kalshi-ext-root {
+      right: 16px;
+      left: 16px;
+    }
+    .kalshi-collapsed-top {
+      padding: 14px 16px 0 16px;
+    }
+    .kalshi-collapsed-divider {
+      margin: 8px 16px;
+    }
+    .kalshi-collapsed-body {
+      padding: 0 16px 14px 16px;
+    }
+    .kalshi-collapsed-logo {
+      font-size: 26px;
+    }
+    .kalshi-collapsed-subtitle {
+      font-size: 13px;
+    }
+    .kalshi-collapsed-market-title {
+      font-size: 13px;
+    }
+  }
+
+  /* ==========================================================
+     SCREENS 2–5 — White expanded panel (Figma spec)
+     ========================================================== */
+  .kalshi-widget-expanded {
+    display: flex;
+    width: 424px;
+    padding: 20px;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    border-radius: 16px;
+    border: 1px solid rgba(0, 0, 0, 0.10);
+    background: #FFF;
+    box-shadow: 0 25px 7px 0 rgba(0,0,0,0.00), 0 16px 6px 0 rgba(0,0,0,0.01), 0 9px 5px 0 rgba(0,0,0,0.02), 0 4px 4px 0 rgba(0,0,0,0.03), 0 1px 2px 0 rgba(0,0,0,0.04);
+  }
+
+  /* Header row: back | Kalshi logo | calendar + add + close */
+  .kalshi-panel-header {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 8px;
+    position: relative;
+  }
+  .kalshi-header-back {
+    width: 24px; height: 24px; cursor: pointer; opacity: 0.4;
+    transition: opacity 0.15s; flex-shrink: 0;
+  }
+  .kalshi-header-back:hover { opacity: 0.7; }
+  .kalshi-panel-logo-img {
+    width: 98px; height: 25px;
+    position: absolute; left: 50%; transform: translateX(-50%);
+  }
+  .kalshi-panel-header-actions { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+  .kalshi-header-icon {
+    width: 24px; height: 24px; cursor: pointer;
+    transition: opacity 0.15s;
+  }
+  .kalshi-header-icon:hover { opacity: 0.7; }
+
+  /* Market title */
+  .kalshi-market-title-bar {
+    align-self: stretch; color: rgba(0, 0, 0, 0.90);
+    font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 600;
+    line-height: 28px; text-align: left;
+  }
+
+  /* Options section - full width */
+  .kalshi-market-options { width: 100%; }
+
+  .kalshi-option-row {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 0; border-bottom: 1px solid rgba(0,0,0,0.06);
+  }
+  .kalshi-option-row:last-child { border-bottom: none; }
+
+  .kalshi-option-icon {
+    width: 28px; height: 28px; border-radius: 4px; flex-shrink: 0;
+  }
+  .kalshi-option-name {
+    font-size: 15px; font-weight: 500; color: var(--kalshi-dark);
+    flex: 1; min-width: 0;
+  }
+  .kalshi-option-odds {
+    font-size: 18px; font-weight: 600; color: #000; line-height: 30px;
+    display: flex; align-items: center; gap: 4px; flex-shrink: 0;
+  }
+  .kalshi-odds-change {
+    display: inline-flex; align-items: center; gap: 1px;
+    font-size: 12px; font-weight: 600; color: var(--kalshi-green);
+  }
+  .kalshi-odds-arrow { width: 7px; height: 6px; }
+
+  .kalshi-option-buttons {
+    display: flex; align-items: center; gap: 6px; flex-shrink: 0;
+  }
+  .kalshi-yes-btn, .kalshi-no-btn {
+    display: flex; padding: 8px 16px;
+    justify-content: center; align-items: center;
+    border-radius: 8px; font-size: 16px;
+    font-weight: 500; line-height: 28px; border: none; cursor: pointer; transition: all 0.15s;
+  }
+  .kalshi-yes-btn { background: rgba(0, 210, 150, 0.10); color: #00D296; }
+  .kalshi-yes-btn:hover { background: rgba(0, 210, 150, 0.20); }
+  .kalshi-no-btn { background: rgba(217, 22, 103, 0.10); color: #D91667; }
+  .kalshi-no-btn:hover { background: rgba(217, 22, 103, 0.20); }
+
+  /* Meta row */
+  .kalshi-market-meta {
+    display: flex; align-items: center; justify-content: space-between;
+    width: 100%;
+  }
+  .kalshi-volume-text { font-size: 13px; color: rgba(0,0,0,0.4); font-weight: 500; }
+  .kalshi-more-markets {
+    color: #00150F; font-family: 'Inter', sans-serif; font-size: 15px;
+    font-style: normal; font-weight: 400; line-height: 24px;
+    cursor: pointer; display: flex; align-items: center; gap: 4px;
+  }
+
+  /* Buy button */
+  .kalshi-buy-main-btn {
+    display: flex; width: 100%; padding: 12px 10px;
+    justify-content: center; align-items: center; gap: 10px;
+    align-self: stretch; border-radius: 8px;
+    background: #00D296; color: #fff; font-size: 18px;
+    font-weight: 500; line-height: 30px; border: none; cursor: pointer;
+    transition: background 0.15s; text-align: center;
+  }
+  .kalshi-buy-main-btn:hover { background: #00b882; }
+  .kalshi-buy-main-btn:active { transform: scale(0.98); }
+  .kalshi-buy-main-btn:disabled { background: rgba(0,0,0,0.06); color: rgba(0,0,0,0.25); cursor: not-allowed; }
+
+  /* Countdown section */
+  .kalshi-countdown-section {
+    text-align: center; width: 100%;
+    padding-top: 20px; border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  .kalshi-countdown-label {
+    color: rgba(0, 0, 0, 0.90); font-family: 'Inter', sans-serif;
+    font-size: 12px; font-weight: 600; line-height: 14px;
+    letter-spacing: 1.44px; text-transform: uppercase; margin-bottom: 12px;
+  }
+  .kalshi-countdown-timer {
+    display: flex; align-items: center; justify-content: center; gap: 4px;
+    font-size: 20px; font-weight: 600; color: var(--kalshi-green);
+    font-variant-numeric: tabular-nums;
+  }
+  .kalshi-countdown-sep { color: var(--kalshi-green); font-weight: 600; font-size: 20px; }
+  .kalshi-countdown-date { font-size: 13px; color: rgba(0,0,0,0.35); margin-top: 8px; }
+
+  /* Order entry — Figma spec */
+  .kalshi-order-section { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+
+  .kalshi-selected-option {
+    display: flex; align-items: center; gap: 10px; width: 100%;
+  }
+  .kalshi-selected-icon { width: 28px; height: 28px; border-radius: 4px; flex-shrink: 0; }
+  .kalshi-selected-label {
+    font-family: 'Inter', sans-serif; font-size: 15px; font-weight: 500; line-height: 24px;
+  }
+  .kalshi-selected-label .side-tag { color: #00D296; }
+  .kalshi-selected-label .side-tag.no { color: #D91667; }
+  .kalshi-selected-label .opt-name { color: rgba(0, 0, 0, 0.90); }
+
+  /* Yes/No toggle frames */
+  .kalshi-toggle-row {
+    display: flex; align-items: center; gap: 8px; align-self: stretch; width: 100%;
+  }
+  .kalshi-toggle-frame {
+    flex: 1; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  }
+  .kalshi-price-toggle-btn {
+    width: 100%; padding: 10px 16px; border: 2px solid rgba(0,0,0,0.10);
+    font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 500; line-height: 30px;
+    cursor: pointer; transition: all 0.2s; background: #fff;
+    text-align: center; border-radius: 100px;
+  }
+  .kalshi-price-toggle-btn.active-yes { border-color: #00D296; background: rgba(0, 210, 150, 0.08); color: #00D296; }
+  .kalshi-price-toggle-btn.active-no { border-color: #D91667; background: rgba(217, 22, 103, 0.08); color: #D91667; }
+  .kalshi-price-toggle-btn[data-side="yes"]:not(.active-yes) { color: #00D296; background: #fff; border-color: rgba(0,0,0,0.10); }
+  .kalshi-price-toggle-btn[data-side="no"]:not(.active-no) { color: #D91667; background: #fff; border-color: rgba(0,0,0,0.10); }
+  .kalshi-toggle-conversion {
+    font-size: 13px; color: rgba(0,0,0,0.4); display: flex; align-items: center; gap: 4px;
+  }
+  .kalshi-toggle-conversion .payout { font-weight: 700; color: var(--kalshi-green); }
+
+  /* Separator line */
+  .kalshi-separator {
+    width: 100%; height: 1px; background: rgba(0, 0, 0, 0.10);
+  }
+
+  /* Green border container — wraps selected option through amount */
+  .kalshi-green-container {
+    display: flex; padding: 12px 16px; flex-direction: column;
+    justify-content: center; align-items: flex-start;
+    gap: 16px; align-self: stretch;
+    border-radius: 8px; border: 2px solid #00D296; background: #FFF;
+  }
+
+  /* Dollar amount row */
+  .kalshi-amount-section {
+    display: flex; flex-direction: column; gap: 4px; position: relative; width: 100%;
+  }
+  .kalshi-amount-top {
+    display: flex; align-items: center; gap: 27px; align-self: stretch;
+  }
+  .kalshi-amount-label-row {
+    display: flex; align-items: center; gap: 4px; cursor: pointer;
+  }
+  .kalshi-amount-label {
+    color: rgba(0, 0, 0, 0.90); font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 500; line-height: 24px;
+  }
+  .kalshi-dropdown-icon { width: 20px; height: 20px; }
+  .kalshi-amount-input {
+    font-family: 'Inter', sans-serif; font-size: 28px; font-weight: 500;
+    line-height: 36px; color: rgba(0, 0, 0, 0.40);
+    margin-left: auto; border: none; outline: none; background: transparent;
+    text-align: right; min-width: 80px; max-width: 220px; font-variant-numeric: tabular-nums;
+  }
+  .kalshi-amount-input.has-value { color: rgba(0, 0, 0, 0.90); }
+  .kalshi-amount-input::placeholder { color: rgba(0, 0, 0, 0.40); }
+  .kalshi-amount-input::-webkit-outer-spin-button,
+  .kalshi-amount-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+  .kalshi-interest-badge {
+    color: #00D296; font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 400; line-height: 24px;
+  }
+
+  .kalshi-order-summary {
+    width: 100%; display: flex; flex-direction: column; gap: 8px;
+    border-top: 1px solid rgba(0,0,0,0.10); padding-top: 16px;
+  }
+  .kalshi-order-summary-row {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .kalshi-order-summary-label {
+    color: rgba(0, 0, 0, 0.50); font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 400; line-height: 24px;
+  }
+  .kalshi-order-summary-value {
+    color: rgba(0, 0, 0, 0.90); font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 600; line-height: 24px;
+  }
+  .kalshi-order-summary-value.payout {
+    color: var(--kalshi-green); font-size: 20px; font-weight: 700;
+  }
+
+  .kalshi-buy-order-btn {
+    display: flex; width: 100%; padding: 12px 10px;
+    justify-content: center; align-items: center; gap: 10px;
+    border-radius: 8px; background: #00D296; color: #fff;
+    font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 500; line-height: 30px;
+    border: none; cursor: pointer; transition: all 0.15s;
+  }
+  .kalshi-buy-order-btn:hover { background: #00b882; }
+  .kalshi-buy-order-btn:disabled { background: rgba(0,0,0,0.06); color: rgba(0,0,0,0.25); cursor: not-allowed; }
+
+  .kalshi-gpay-btn {
+    display: flex; width: 100%; padding: 12px 10px;
+    justify-content: center; align-items: center; gap: 10px;
+    align-self: stretch; border-radius: 8px;
+    background: rgba(0, 0, 0, 0.90);
+    border: none; cursor: pointer; transition: all 0.15s;
+  }
+  .kalshi-gpay-btn:hover { background: rgba(0, 0, 0, 1); }
+  .kalshi-gpay-content {
+    display: flex; align-items: center; gap: 8px;
+  }
+  .kalshi-gpay-icon { width: 19px; height: 19px; }
+  .kalshi-gpay-text {
+    color: #EEE; font-family: 'Inter', sans-serif;
+    font-size: 18px; font-weight: 500; line-height: 30px;
+  }
+  .kalshi-gpay-sep {
+    width: 1px; height: 18px; background: rgba(255,255,255,0.25); margin: 0 4px;
+  }
+  .kalshi-gpay-card {
+    color: rgba(255,255,255,0.6); font-size: 14px; font-weight: 500;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .kalshi-gpay-card-icon { width: 28px; height: 20px; }
+  .kalshi-gpay-card-num {
+    color: #EEE; font-family: 'Inter', sans-serif;
+    font-size: 18px; font-weight: 500; line-height: 30px;
+  }
+
+  /* GPay Verification Modal */
+  .kalshi-gpay-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.50); z-index: 999999;
+    display: flex; align-items: center; justify-content: center;
+    animation: kalshi-fadeIn 0.2s ease;
+  }
+  .kalshi-gpay-modal {
+    background: #fff; border-radius: 16px; width: 380px; max-width: 90vw;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.3); overflow: hidden;
+    animation: kalshi-modalIn 0.25s ease;
+  }
+  @keyframes kalshi-modalIn {
+    from { opacity: 0; transform: scale(0.95) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  .kalshi-gpay-modal-header {
+    display: flex; flex-direction: column; align-items: center;
+    padding: 32px 24px 24px; position: relative;
+  }
+  .kalshi-gpay-modal-graphic {
+    width: 120px; height: 120px; border-radius: 50%;
+    background: rgba(66, 133, 244, 0.08);
+    display: flex; align-items: center; justify-content: center;
+    position: relative; margin-bottom: 20px;
+  }
+  .kalshi-gpay-fingerprint {
+    font-size: 48px; color: #4285F4; line-height: 1;
+  }
+  .kalshi-gpay-modal-confetti {
+    position: absolute; width: 100%; height: 100%;
+  }
+  .kalshi-gpay-confetti-dot {
+    position: absolute; border-radius: 2px;
+  }
+  .kalshi-gpay-lock {
+    position: absolute; left: 8px; bottom: 8px;
+    width: 28px; height: 28px; background: #fff; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 14px;
+  }
+  .kalshi-gpay-check {
+    position: absolute; right: 8px; bottom: 8px;
+    width: 28px; height: 28px; background: #fff; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    font-size: 14px; color: #34A853;
+  }
+  .kalshi-gpay-modal-title {
+    color: rgba(0,0,0,0.87); font-family: 'Inter', sans-serif;
+    font-size: 16px; font-weight: 500; line-height: 24px;
+    text-align: center;
+  }
+  .kalshi-gpay-modal-body {
+    padding: 0 24px;
+  }
+  .kalshi-gpay-modal-row {
+    display: flex; align-items: center; padding: 14px 0;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  .kalshi-gpay-modal-label {
+    color: rgba(0,0,0,0.87); font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; line-height: 20px;
+    min-width: 80px;
+  }
+  .kalshi-gpay-modal-val {
+    color: rgba(0,0,0,0.60); font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 400; line-height: 20px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .kalshi-gpay-modal-card-icon { width: 20px; height: 14px; }
+  .kalshi-gpay-modal-footer {
+    display: flex; align-items: center; justify-content: flex-end;
+    gap: 12px; padding: 16px 24px;
+  }
+  .kalshi-gpay-modal-cancel {
+    background: none; border: none; cursor: pointer;
+    color: #4285F4; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; padding: 10px 20px;
+    border-radius: 8px; transition: background 0.15s;
+  }
+  .kalshi-gpay-modal-cancel:hover { background: rgba(66,133,244,0.08); }
+  .kalshi-gpay-modal-verify {
+    background: #4285F4; border: none; cursor: pointer;
+    color: #fff; font-family: 'Inter', sans-serif;
+    font-size: 14px; font-weight: 600; padding: 10px 24px;
+    border-radius: 8px; transition: background 0.15s;
+  }
+  .kalshi-gpay-modal-verify:hover { background: #3367d6; }
+  .kalshi-confirmation { width: 100%; display: flex; flex-direction: column; gap: 20px; }
+  .kalshi-confirmation-title {
+    align-self: stretch; color: rgba(0, 0, 0, 0.90);
+    font-family: 'Inter', sans-serif; font-size: 20px; font-weight: 600; line-height: 28px;
+  }
+  .kalshi-confirmation-card {
+    display: flex; padding: 16px; flex-direction: column; gap: 16px;
+    align-self: stretch; border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.10); background: #FFF;
+  }
+  .kalshi-conf-market-title {
+    color: rgba(0, 0, 0, 0.90); font-family: 'Inter', sans-serif;
+    font-size: 16px; font-weight: 600; line-height: 24px;
+  }
+  .kalshi-conf-option {
+    display: flex; align-items: center; gap: 10px;
+  }
+  .kalshi-conf-option-icon { width: 28px; height: 28px; border-radius: 4px; }
+  .kalshi-conf-option-name {
+    color: rgba(0, 0, 0, 0.90); font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 500; line-height: 24px;
+  }
+  .kalshi-conf-separator { width: 100%; height: 1px; background: rgba(0, 0, 0, 0.10); }
+  .kalshi-conf-details { display: flex; flex-direction: column; gap: 8px; }
+  .kalshi-conf-row {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .kalshi-conf-label {
+    color: rgba(0, 0, 0, 0.50); font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 400; line-height: 24px;
+  }
+  .kalshi-conf-value {
+    color: rgba(0, 0, 0, 0.90); font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 600; line-height: 24px;
+  }
+  .kalshi-conf-value.payout {
+    color: var(--kalshi-green); font-size: 20px; font-weight: 700;
+  }
+  .kalshi-done-btn {
+    display: flex; width: 100%; padding: 12px 10px;
+    justify-content: center; align-items: center; gap: 10px;
+    border-radius: 8px; background: var(--kalshi-green); color: #fff;
+    font-family: 'Inter', sans-serif; font-size: 18px; font-weight: 500; line-height: 30px;
+    border: none; cursor: pointer; transition: background 0.15s;
+  }
+  .kalshi-done-btn:hover { background: var(--kalshi-green-hover); }
+
+  .kalshi-related-section { width: 100%; display: flex; flex-direction: column; gap: 16px; }
+  .kalshi-related-title {
+    color: rgba(0, 0, 0, 0.90); font-family: 'Inter', sans-serif;
+    font-size: 16px; font-weight: 600; line-height: 24px;
+  }
+  .kalshi-related-item {
+    display: flex; align-items: center; gap: 14px;
+    cursor: pointer; transition: opacity 0.15s;
+  }
+  .kalshi-related-item:hover { opacity: 0.7; }
+  .kalshi-related-img {
+    width: 40px; height: 40px; border-radius: 8px; object-fit: cover; flex-shrink: 0;
+  }
+  .kalshi-related-name {
+    color: rgba(0, 0, 0, 0.90); font-family: 'Inter', sans-serif;
+    font-size: 15px; font-weight: 500; line-height: 24px; flex: 1;
+  }
+  .kalshi-related-arrow { color: rgba(0,0,0,0.3); font-size: 18px; }
+
+  .kalshi-fade-in { animation: kalshi-fadeIn 0.25s ease; }
+  @keyframes kalshi-fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+</style>
+</head>
+<body>
+
+<!-- Browser top bar -->
+<!-- F1 Nav -->
+<nav class="sim-nav">
+  <span class="sim-nav-logo">F1</span>
+  <div class="sim-nav-links">
+    <a href="#">Schedule ▾</a>
+    <a href="#">Results ▾</a>
+    <a href="#">News ▾</a>
+    <a href="#">Drivers ▾</a>
+    <a href="#">Teams ▾</a>
+    <a href="#">Fantasy & Gaming ▾</a>
+    <a href="#">F1 Members' Area</a>
+  </div>
+  <div class="sim-nav-right">
+    <div class="sim-nav-icon">🔍</div>
+    <div class="sim-nav-icon">👤</div>
+  </div>
+</nav>
+
+<!-- Sub-nav -->
+<div class="sim-subnav">
+  <div class="sim-subnav-left">
+    <span class="sim-breadcrumb-item"><span class="dot">●</span> Mexico ›</span>
+    <div class="sim-race-timer">
+      <span class="label">Race</span>
+      <span class="num">12</span><span class="unit">H</span>
+      <span class="num">15</span><span class="unit">M</span>
+      <span class="num">04</span><span class="unit">S</span>
+    </div>
+  </div>
+  <div class="sim-subnav-right">
+    <span class="sim-tag-sponsor">MY TIME · TRACK TIME</span>
+  </div>
+</div>
+
+<!-- Page content — two column desktop -->
+<div class="sim-page">
+  <main class="sim-main">
+    <div class="sim-tags"><span>Mexico</span><span>FP3</span><span>2025</span></div>
+    <h1 class="sim-headline">FP3: Norris leads Hamilton and Russell in final practice ahead of Mexico City Grand Prix</h1>
+    <p class="sim-subhead">Lando Norris was fastest in Free Practice 3 as his title rivals struggled to match his pace in Mexico.</p>
+    <div class="sim-time">13 hours ago</div>
+    <div class="sim-hero">
+      <span class="sim-hero-label">IMAGE: F1 CAR — MEXICO CITY GP 2025</span>
+    </div>
+    <div class="sim-article-body">
+      <p>Norris posted a time of 1:16.505 to top the final practice session, finishing 0.226s clear of Lewis Hamilton, while George Russell was third fastest for Mercedes.</p>
+      <p>Championship leader Max Verstappen could only manage fourth, 0.359s off the pace, raising questions about Red Bull's competitiveness on a track that has traditionally been one of their strongest.</p>
+      <p>Carlos Sainz rounded out the top five for Ferrari, with team-mate Charles Leclerc back in seventh behind Alpine's Pierre Gasly, who impressed once again with his pace.</p>
+    </div>
+  </main>
+  <aside class="sim-sidebar">
+    <div class="sim-sidebar-ad">Advertisement</div>
+  </aside>
+</div>
+
+<!-- Kalshi Widget -->
+<div id="kalshi-ext-root"></div>
+
+<script>
+(function() {
+  "use strict";
+
+  const ICONS = {
+    arrow: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>'),
+    chevron: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#1A1A1A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>'),
+    ellipsis: "data:image/svg+xml," + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="12" height="28" viewBox="0 0 12 28" fill="#1A1A1A"><circle cx="3" cy="6" r="2.2"/><circle cx="9" cy="6" r="2.2"/><circle cx="3" cy="14" r="2.2"/><circle cx="9" cy="14" r="2.2"/><circle cx="3" cy="22" r="2.2"/><circle cx="9" cy="22" r="2.2"/></svg>')
+  };
+
+  const MARKETS = [
+    { id:"gran-premio-mexico-winner", title:"Gran Premio de Mexico Winner?", img:"data:image/png;base64,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",
+      options:[{name:"Lando Norris",odds:67,color:"#FF8700"},{name:"Charles Leclerc",odds:61,color:"#DC0000"}],
+      volume:"6,719,036", endsAt:new Date(Date.now()+11*3600000+47*60000).toISOString() },
+    { id:"f1-drivers-champion", title:"F1 Drivers Champion?", img:"data:image/png;base64,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",
+      options:[{name:"Max Verstappen",odds:82,color:"#1E41FF"},{name:"Lando Norris",odds:15,color:"#FF8700"}],
+      volume:"12,450,200", endsAt:new Date(Date.now()+40*24*3600000).toISOString() },
+    { id:"gran-premio-mexico-podium", title:"Gran Premio de Mexico Podium Finishers?", img:"data:image/png;base64,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",
+      options:[{name:"Lando Norris",odds:78,color:"#FF8700"},{name:"Carlos Sainz",odds:55,color:"#DC0000"}],
+      volume:"3,200,100", endsAt:new Date(Date.now()+11*3600000+47*60000).toISOString() }
+  ];
+
+
+  // Screen 2+ icons from Figma
+  const S2_ICONS = {
+    arrow_back: "data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20opacity%3D%220.4%22%3E%0A%3Cmask%20id%3D%22mask0_4026_269%22%20style%3D%22mask-type%3Aalpha%22%20maskUnits%3D%22userSpaceOnUse%22%20x%3D%220%22%20y%3D%220%22%20width%3D%2224%22%20height%3D%2224%22%3E%0A%3Crect%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23D9D9D9%22%2F%3E%0A%3C%2Fmask%3E%0A%3Cg%20mask%3D%22url%28%23mask0_4026_269%29%22%3E%0A%3Cpath%20d%3D%22M7.825%2013L13.425%2018.6L12%2020L4%2012L12%204L13.425%205.4L7.825%2011H20V13H7.825Z%22%20fill%3D%22%231C1B1F%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E",
+    close: "data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20opacity%3D%220.4%22%3E%0A%3Cmask%20id%3D%22mask0_4004_1475%22%20style%3D%22mask-type%3Aalpha%22%20maskUnits%3D%22userSpaceOnUse%22%20x%3D%220%22%20y%3D%220%22%20width%3D%2224%22%20height%3D%2224%22%3E%0A%3Crect%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23D9D9D9%22%2F%3E%0A%3C%2Fmask%3E%0A%3Cg%20mask%3D%22url%28%23mask0_4004_1475%29%22%3E%0A%3Cpath%20d%3D%22M6.4%2019L5%2017.6L10.6%2012L5%206.4L6.4%205L12%2010.6L17.6%205L19%206.4L13.4%2012L19%2017.6L17.6%2019L12%2013.4L6.4%2019Z%22%20fill%3D%22%231C1B1F%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E",
+    date_range: "data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20opacity%3D%220.4%22%3E%0A%3Cmask%20id%3D%22mask0_4004_1469%22%20style%3D%22mask-type%3Aalpha%22%20maskUnits%3D%22userSpaceOnUse%22%20x%3D%220%22%20y%3D%220%22%20width%3D%2224%22%20height%3D%2224%22%3E%0A%3Crect%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23D9D9D9%22%2F%3E%0A%3C%2Fmask%3E%0A%3Cg%20mask%3D%22url%28%23mask0_4004_1469%29%22%3E%0A%3Cpath%20d%3D%22M8%2014C7.71667%2014%207.47917%2013.9042%207.2875%2013.7125C7.09583%2013.5208%207%2013.2833%207%2013C7%2012.7167%207.09583%2012.4792%207.2875%2012.2875C7.47917%2012.0958%207.71667%2012%208%2012C8.28333%2012%208.52083%2012.0958%208.7125%2012.2875C8.90417%2012.4792%209%2012.7167%209%2013C9%2013.2833%208.90417%2013.5208%208.7125%2013.7125C8.52083%2013.9042%208.28333%2014%208%2014ZM12%2014C11.7167%2014%2011.4792%2013.9042%2011.2875%2013.7125C11.0958%2013.5208%2011%2013.2833%2011%2013C11%2012.7167%2011.0958%2012.4792%2011.2875%2012.2875C11.4792%2012.0958%2011.7167%2012%2012%2012C12.2833%2012%2012.5208%2012.0958%2012.7125%2012.2875C12.9042%2012.4792%2013%2012.7167%2013%2013C13%2013.2833%2012.9042%2013.5208%2012.7125%2013.7125C12.5208%2013.9042%2012.2833%2014%2012%2014ZM16%2014C15.7167%2014%2015.4792%2013.9042%2015.2875%2013.7125C15.0958%2013.5208%2015%2013.2833%2015%2013C15%2012.7167%2015.0958%2012.4792%2015.2875%2012.2875C15.4792%2012.0958%2015.7167%2012%2016%2012C16.2833%2012%2016.5208%2012.0958%2016.7125%2012.2875C16.9042%2012.4792%2017%2012.7167%2017%2013C17%2013.2833%2016.9042%2013.5208%2016.7125%2013.7125C16.5208%2013.9042%2016.2833%2014%2016%2014ZM5%2022C4.45%2022%203.97917%2021.8042%203.5875%2021.4125C3.19583%2021.0208%203%2020.55%203%2020V6C3%205.45%203.19583%204.97917%203.5875%204.5875C3.97917%204.19583%204.45%204%205%204H6V2H8V4H16V2H18V4H19C19.55%204%2020.0208%204.19583%2020.4125%204.5875C20.8042%204.97917%2021%205.45%2021%206V20C21%2020.55%2020.8042%2021.0208%2020.4125%2021.4125C20.0208%2021.8042%2019.55%2022%2019%2022H5ZM5%2020H19V10H5V20ZM5%208H19V6H5V8Z%22%20fill%3D%22%231C1B1F%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E",
+    add_circle: "data:image/svg+xml,%3Csvg%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20opacity%3D%220.4%22%3E%0A%3Cmask%20id%3D%22mask0_4004_1472%22%20style%3D%22mask-type%3Aalpha%22%20maskUnits%3D%22userSpaceOnUse%22%20x%3D%220%22%20y%3D%220%22%20width%3D%2224%22%20height%3D%2224%22%3E%0A%3Crect%20width%3D%2224%22%20height%3D%2224%22%20fill%3D%22%23D9D9D9%22%2F%3E%0A%3C%2Fmask%3E%0A%3Cg%20mask%3D%22url%28%23mask0_4004_1472%29%22%3E%0A%3Cpath%20d%3D%22M11%2017H13V13H17V11H13V7H11V11H7V13H11V17ZM12%2022C10.6167%2022%209.31667%2021.7375%208.1%2021.2125C6.88333%2020.6875%205.825%2019.975%204.925%2019.075C4.025%2018.175%203.3125%2017.1167%202.7875%2015.9C2.2625%2014.6833%202%2013.3833%202%2012C2%2010.6167%202.2625%209.31667%202.7875%208.1C3.3125%206.88333%204.025%205.825%204.925%204.925C5.825%204.025%206.88333%203.3125%208.1%202.7875C9.31667%202.2625%2010.6167%202%2012%202C13.3833%202%2014.6833%202.2625%2015.9%202.7875C17.1167%203.3125%2018.175%204.025%2019.075%204.925C19.975%205.825%2020.6875%206.88333%2021.2125%208.1C21.7375%209.31667%2022%2010.6167%2022%2012C22%2013.3833%2021.7375%2014.6833%2021.2125%2015.9C20.6875%2017.1167%2019.975%2018.175%2019.075%2019.075C18.175%2019.975%2017.1167%2020.6875%2015.9%2021.2125C14.6833%2021.7375%2013.3833%2022%2012%2022ZM12%2020C14.2333%2020%2016.125%2019.225%2017.675%2017.675C19.225%2016.125%2020%2014.2333%2020%2012C20%209.76667%2019.225%207.875%2017.675%206.325C16.125%204.775%2014.2333%204%2012%204C9.76667%204%207.875%204.775%206.325%206.325C4.775%207.875%204%209.76667%204%2012C4%2014.2333%204.775%2016.125%206.325%2017.675C7.875%2019.225%209.76667%2020%2012%2020Z%22%20fill%3D%22%231C1B1F%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E",
+    kalshi_logo: "data:image/svg+xml,%3Csvg%20width%3D%2298%22%20height%3D%2225%22%20viewBox%3D%220%200%2098%2025%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cpath%20d%3D%22M5.52413%200.0280762V11.2415L15.8533%200.0280762H22.5522L13.0769%2010.3076L23.1652%2025H16.5474L9.18067%2014.4604L5.52413%2018.4326V25H0V0.0280762H5.52413Z%22%20fill%3D%22%2300D296%22%2F%3E%0A%3Cpath%20d%3D%22M50.7346%2024.9988H45.5301V0H50.7346V24.9988Z%22%20fill%3D%22%2300D296%22%2F%3E%0A%3Cpath%20d%3D%22M61.7292%206.13647C64.0936%206.22162%2065.9919%206.76222%2067.4681%207.7356C69.0693%208.77394%2069.9238%2010.2282%2070.0572%2012.0972H65.1199C65.0398%2011.3963%2064.6652%2010.8502%2063.9713%2010.4089C63.3874%2010.0229%2062.6606%209.79556%2061.7729%209.74487L61.3834%209.73389C60.3961%209.73389%2059.5953%209.91627%2058.9815%2010.2795C58.3944%2010.643%2058.1002%2011.1107%2058.1002%2011.7078C58.1003%2012.1487%2058.2607%2012.4597%2058.5808%2012.6672C58.901%2012.875%2059.3283%2013.031%2059.8354%2013.1348C60.3425%2013.2386%2061.2229%2013.3423%2062.4233%2013.446C64.9853%2013.7317%2066.934%2014.2774%2068.2683%2015.0562C69.6559%2015.8088%2070.323%2017.1324%2070.3232%2019.0271C70.3232%2020.2211%2069.9502%2021.2606%2069.2296%2022.1692C68.509%2023.0776%2067.5211%2023.778%2066.2134%2024.2712C64.9324%2024.7385%2063.4379%2024.9988%2061.7567%2024.9988C59.1412%2024.9988%2056.9792%2024.4268%2055.3512%2023.3105C53.6967%2022.1685%2052.8426%2020.6112%2052.7358%2018.6646H57.647C57.7271%2019.4691%2058.1271%2020.1182%2058.8742%2020.6372C59.6214%2021.1304%2060.5555%2021.3904%2061.703%2021.3904C62.797%2021.3904%2063.6778%2021.2345%2064.3184%2020.8972C64.9588%2020.5337%2065.2796%2020.0399%2065.2796%2019.3909C65.2796%2018.9237%2065.1187%2018.56%2064.8252%2018.3264C64.5317%2018.093%2064.1052%2017.9111%2063.5718%2017.8333C63.0381%2017.7034%2062.1566%2017.5736%2060.929%2017.4438C59.2477%2017.2361%2057.8598%2016.9512%2056.7656%2016.6138C55.6716%2016.2763%2054.7644%2015.7571%2054.124%2015.0305C53.4567%2014.3038%2053.1365%2013.3681%2053.1365%2012.1741C53.1366%2010.9802%2053.4568%209.94166%2054.124%209.0332C54.8179%208.09885%2055.7791%207.39778%2057.0066%206.87866C58.2342%206.38558%2059.6488%206.12671%2061.2498%206.12671L61.7292%206.13647Z%22%20fill%3D%22%2300D296%22%2F%3E%0A%3Cpath%20d%3D%22M77.5301%208.90381C78.9445%207.24261%2080.8125%206.41242%2083.1341%206.41235L83.5499%206.41968C85.6017%206.49869%2087.2811%207.16956%2088.6321%208.41064C90.0733%209.73453%2090.7943%2011.9414%2090.7943%2015.0305V24.9988H85.5897V15.238C85.5897%2013.7066%2085.269%2012.5646%2084.6285%2011.7859C84.0281%2011.0315%2083.1466%2010.6187%2081.9831%2010.5701L81.7472%2010.5652C80.4127%2010.5652%2079.371%2011.007%2078.6237%2011.8896C77.8768%2012.7722%2077.5302%2013.9919%2077.5301%2015.575V24.9988H72.3256V0H77.5301V8.90381Z%22%20fill%3D%22%2300D296%22%2F%3E%0A%3Cpath%20fill-rule%3D%22evenodd%22%20clip-rule%3D%22evenodd%22%20d%3D%22M33.3333%206.15234C36.0021%206.15234%2038.0842%206.72285%2039.5253%207.86499C40.9933%209.00718%2041.74%2010.6689%2041.74%2012.8235V19.2871C41.74%2019.7284%2041.8478%2020.0405%2042.0346%2020.2222C42.2215%2020.3776%2042.5419%2020.481%2042.9684%2020.481H43.5289V24.7644H40.8861C38.6595%2024.7643%2037.4881%2023.8746%2037.3943%2022.1167L37.3906%2021.7529C36.6966%2022.7913%2035.8426%2023.5967%2034.8551%2024.1418C33.841%2024.6871%2032.6397%2024.9719%2031.1986%2024.9719C29.0902%2024.9719%2027.3817%2024.5051%2026.0739%2023.5706C24.793%2022.6101%2024.1527%2021.286%2024.1526%2019.5728C24.1526%2017.626%2024.8996%2016.12%2026.3673%2015.0818C27.8619%2014.0175%2030.0239%2013.473%2032.8527%2013.4729H36.6166V12.5903C36.6166%2011.7597%2036.2959%2011.1097%2035.6553%2010.6165C35.0149%2010.1234%2034.1603%209.8645%2033.0662%209.8645C32.1055%209.86456%2031.3317%2010.0721%2030.7179%2010.4614C30.1042%2010.8767%2029.7311%2011.4223%2029.6243%2012.0972H24.5796C24.7398%2010.2281%2025.6209%208.77395%2027.1687%207.7356C28.7166%206.69736%2030.7714%206.15237%2033.3333%206.15234ZM32.8002%2016.8213C31.733%2016.8213%2030.8786%2017.0285%2030.2648%2017.4695C29.6777%2017.8848%2029.3835%2018.4564%2029.3834%2019.209C29.3834%2019.858%2029.6242%2020.3516%2030.1312%2020.741C30.6383%2021.1302%2031.3321%2021.3123%2032.186%2021.3123C33.5471%2021.3122%2034.6141%2020.948%2035.3882%2020.1953C36.1621%2019.4424%2036.5899%2018.4302%2036.6166%2017.1582V16.8213H32.8002Z%22%20fill%3D%22%2300D296%22%2F%3E%0A%3Cpath%20d%3D%22M98%2024.9719H92.7954V6.61987H98V24.9719Z%22%20fill%3D%22%2300D296%22%2F%3E%0A%3Cpath%20d%3D%22M95.3846%200C96.1317%200%2096.7456%200.259291%2097.226%200.726318C97.7063%201.16756%2097.9737%201.76505%2097.9738%202.46582C97.9738%203.16668%2097.7064%203.73775%2097.226%204.23096C96.7456%204.72417%2096.1052%204.9585%2095.3846%204.9585C94.6642%204.9585%2094.0241%204.69812%2093.517%204.23096C93.0366%203.76369%2092.7692%203.16671%2092.7692%202.46582C92.7693%201.76505%2093.0367%201.19352%2093.517%200.726318C94.024%200.259399%2094.6644%200%2095.3846%200Z%22%20fill%3D%22%2300D296%22%2F%3E%0A%3C%2Fsvg%3E",
+    icon_orange: "data:image/svg+xml,%3Csvg%20width%3D%2228%22%20height%3D%2228%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20clip-path%3D%22url%28%23clip0_4004_1420%29%22%3E%0A%3Cpath%20d%3D%22M0%200H28V28H0V0Z%22%20fill%3D%22%23FF8300%22%2F%3E%0A%3Cpath%20d%3D%22M28%2028H9.33333L28%209.33333V28Z%22%20fill%3D%22%23191919%22%2F%3E%0A%3C%2Fg%3E%0A%3Cdefs%3E%0A%3CclipPath%20id%3D%22clip0_4004_1420%22%3E%0A%3Crect%20width%3D%2228%22%20height%3D%2228%22%20rx%3D%224%22%20fill%3D%22white%22%2F%3E%0A%3C%2FclipPath%3E%0A%3C%2Fdefs%3E%0A%3C%2Fsvg%3E",
+    icon_red: "data:image/svg+xml,%3Csvg%20width%3D%2228%22%20height%3D%2228%22%20viewBox%3D%220%200%2028%2028%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20clip-path%3D%22url%28%23clip0_4004_1436%29%22%3E%0A%3Cpath%20d%3D%22M0%200H28V28H0V0Z%22%20fill%3D%22%23DC0000%22%2F%3E%0A%3Cpath%20d%3D%22M28%2028H9.33333L28%209.33333V28Z%22%20fill%3D%22%23E5E5E5%22%2F%3E%0A%3C%2Fg%3E%0A%3Cdefs%3E%0A%3CclipPath%20id%3D%22clip0_4004_1436%22%3E%0A%3Crect%20width%3D%2228%22%20height%3D%2228%22%20rx%3D%224%22%20fill%3D%22white%22%2F%3E%0A%3C%2FclipPath%3E%0A%3C%2Fdefs%3E%0A%3C%2Fsvg%3E",
+    polygon_up: "data:image/svg+xml,%3Csvg%20width%3D%227%22%20height%3D%226%22%20viewBox%3D%220%200%207%206%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cpath%20d%3D%22M3.46387%200L6.92797%206H-0.000234365L3.46387%200Z%22%20fill%3D%22%2300D296%22%2F%3E%0A%3C%2Fsvg%3E",
+    dot: "data:image/svg+xml,%3Csvg%20width%3D%222%22%20height%3D%222%22%20viewBox%3D%220%200%202%202%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Ccircle%20cx%3D%221%22%20cy%3D%221%22%20r%3D%221%22%20fill%3D%22black%22%20fill-opacity%3D%220.4%22%2F%3E%0A%3C%2Fsvg%3E",
+    google: "data:image/svg+xml,%3Csvg%20width%3D%2219%22%20height%3D%2219%22%20viewBox%3D%220%200%2019%2019%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cg%20clip-path%3D%22url%28%23clip0_4004_1569%29%22%3E%0A%3Cpath%20d%3D%22M18.8152%209.71895C18.8152%209.07317%2018.7629%208.42389%2018.6512%207.78857H9.69043V11.4469H14.8218C14.6089%2012.6267%2013.9247%2013.6705%2012.9229%2014.3337V16.7074H15.9843C17.782%2015.0528%2018.8152%2012.6093%2018.8152%209.71895Z%22%20fill%3D%22%234285F4%22%2F%3E%0A%3Cpath%20d%3D%22M9.68968%2019.0009C12.2519%2019.0009%2014.4127%2018.1597%2015.987%2016.7075L12.9256%2014.3338C12.0739%2014.9133%2010.9743%2015.2414%209.69317%2015.2414C7.21475%2015.2414%205.11332%2013.5693%204.35932%2011.3213H1.2002V13.7683C2.81292%2016.9763%206.09771%2019.0009%209.68968%2019.0009Z%22%20fill%3D%22%2334A853%22%2F%3E%0A%3Cpath%20d%3D%22M4.35663%2011.3212C3.95869%2010.1413%203.95869%208.8637%204.35663%207.68383V5.23682H1.201C-0.146427%207.9212%20-0.146427%2011.0838%201.201%2013.7682L4.35663%2011.3212Z%22%20fill%3D%22%23FBBC04%22%2F%3E%0A%3Cpath%20d%3D%22M9.68968%203.76017C11.0441%203.73923%2012.3531%204.24887%2013.334%205.18439L16.0463%202.47209C14.3289%200.859363%2012.0494%20-0.0272857%209.68968%200.000640198C6.09771%200.000640198%202.81292%202.02527%201.2002%205.23675L4.35583%207.68376C5.10634%205.43224%207.21125%203.76017%209.68968%203.76017Z%22%20fill%3D%22%23EA4335%22%2F%3E%0A%3C%2Fg%3E%0A%3Cdefs%3E%0A%3CclipPath%20id%3D%22clip0_4004_1569%22%3E%0A%3Crect%20width%3D%2219.0001%22%20height%3D%2219.0001%22%20fill%3D%22white%22%2F%3E%0A%3C%2FclipPath%3E%0A%3C%2Fdefs%3E%0A%3C%2Fsvg%3E",
+    payment_card: "data:image/svg+xml,%3Csvg%20width%3D%2228%22%20height%3D%2220%22%20viewBox%3D%220%200%2028%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Crect%20x%3D%220.538462%22%20y%3D%220.538462%22%20width%3D%2226.9231%22%20height%3D%2218.3077%22%20rx%3D%223.76923%22%20fill%3D%22white%22%2F%3E%0A%3Crect%20x%3D%220.538462%22%20y%3D%220.538462%22%20width%3D%2226.9231%22%20height%3D%2218.3077%22%20rx%3D%223.76923%22%20stroke%3D%22%23F2F4F7%22%20stroke-width%3D%221.07692%22%2F%3E%0A%3Cpath%20d%3D%22M17.7695%204.0625C20.8534%204.0625%2023.3533%206.48511%2023.3535%209.47363C23.3535%2012.4623%2020.8535%2014.8857%2017.7695%2014.8857C16.3867%2014.8857%2015.1227%2014.3967%2014.1475%2013.5898C13.1722%2014.3966%2011.9082%2014.8857%2010.5254%2014.8857C7.44143%2014.8857%204.94141%2012.4623%204.94141%209.47363C4.94163%206.48515%207.44157%204.06256%2010.5254%204.0625C11.9078%204.0625%2013.1723%204.55009%2014.1475%205.35645C15.1226%204.55004%2016.3871%204.06255%2017.7695%204.0625Z%22%20fill%3D%22%23ED0006%22%2F%3E%0A%3Cpath%20d%3D%22M17.7695%204.0625C20.8534%204.0625%2023.3533%206.48511%2023.3535%209.47363C23.3535%2012.4623%2020.8535%2014.8857%2017.7695%2014.8857C16.3867%2014.8857%2015.1227%2014.3967%2014.1475%2013.5898C15.3473%2012.5973%2016.1094%2011.1222%2016.1094%209.47363C16.1093%207.82479%2015.3477%206.34894%2014.1475%205.35645C15.1226%204.55005%2016.3871%204.06251%2017.7695%204.0625Z%22%20fill%3D%22%23F9A000%22%2F%3E%0A%3Cpath%20d%3D%22M14.1475%205.35693C15.3477%206.3495%2016.1094%207.82521%2016.1094%209.47412C16.1094%2011.1228%2015.3474%2012.5978%2014.1475%2013.5903C12.9476%2012.5978%2012.1855%2011.1228%2012.1855%209.47412C12.1855%207.82523%2012.9473%206.3495%2014.1475%205.35693Z%22%20fill%3D%22%23FF5E00%22%2F%3E%0A%3C%2Fsvg%3E%0A",
+    dropdown: "data:image/svg+xml,%3Csvg%20width%3D%2220%22%20height%3D%2220%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22none%22%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%3E%0A%3Cmask%20id%3D%22mask0_4004_1558%22%20style%3D%22mask-type%3Aalpha%22%20maskUnits%3D%22userSpaceOnUse%22%20x%3D%220%22%20y%3D%220%22%20width%3D%2220%22%20height%3D%2220%22%3E%0A%3Crect%20width%3D%2220%22%20height%3D%2220%22%20fill%3D%22%23D9D9D9%22%2F%3E%0A%3C%2Fmask%3E%0A%3Cg%20mask%3D%22url%28%23mask0_4004_1558%29%22%3E%0A%3Cpath%20d%3D%22M10%2012.8332L5%207.83317L6.16667%206.6665L10%2010.4998L13.8333%206.6665L15%207.83317L10%2012.8332Z%22%20fill%3D%22black%22%20fill-opacity%3D%220.9%22%2F%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E%0A"
+  };
+
+const RELATED = [
+    {id:"f1-drivers-champion",title:"Fq Drivers Champion?",img:"data:image/png;base64,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"},
+    {id:"gran-premio-mexico-podium",title:"Gran Premio de Mexico Podium Finishers?",img:"data:image/png;base64,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"},
+    {id:"nascar-cup-playoffs",title:"NASCAR Cup series playoffs Winner?",img:"data:image/png;base64,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"}
+  ];
+
+  const S = {screen:"collapsed",mkt:null,opt:null,side:"yes",amt:0,order:null,cdI:null};
+  const root = document.getElementById("kalshi-ext-root");
+
+  // Vertical-only drag + persist position
+  const DRAG_KEY = "kalshi_widget_pos_v1";
+  const clamp = (v, min, max) => Math.max(min, Math.min(max, v));
+
+  const loadPos = () => {
+    try {
+      const raw = localStorage.getItem(DRAG_KEY);
+      if (!raw) return { top: 12 };
+      const p = JSON.parse(raw);
+      if (typeof p?.top !== "number") return { top: 12 };
+      return { top: p.top };
+    } catch { return { top: 12 }; }
+  };
+  const savePos = (p) => { try { localStorage.setItem(DRAG_KEY, JSON.stringify({ top: p.top })); } catch {} };
+
+  const POS = loadPos();
+  root.style.top = POS.top + "px";
+  root.style.right = "16px";
+
+  function bindDragHandle() {
+    const handle = root.querySelector(".kalshi-collapsed-ellipsis");
+    if (!handle || handle.dataset.dragBound === "1") return;
+    handle.dataset.dragBound = "1";
+    handle.style.cursor = "grab";
+    handle.title = "Drag to reposition";
+
+    const startDrag = (startY) => {
+      const startTop = root.getBoundingClientRect().top;
+      handle.style.cursor = "grabbing";
+
+      const onMove = (y) => {
+        const dy = y - startY;
+        let nextTop = startTop + dy;
+        const wH = root.getBoundingClientRect().height;
+        nextTop = clamp(nextTop, 8, window.innerHeight - wH - 8);
+        root.style.top = nextTop + "px";
+        root.style.right = "16px";
+        POS.top = nextTop;
+      };
+
+      const end = () => {
+        window.removeEventListener("mousemove", mm);
+        window.removeEventListener("mouseup", mu);
+        window.removeEventListener("touchmove", tm, { passive: false });
+        window.removeEventListener("touchend", te);
+        handle.style.cursor = "grab";
+        savePos(POS);
+      };
+
+      const mm = (e) => { e.preventDefault(); onMove(e.clientY); };
+      const mu = () => end();
+      const tm = (e) => { e.preventDefault(); if (e.touches[0]) onMove(e.touches[0].clientY); };
+      const te = () => end();
+
+      window.addEventListener("mousemove", mm);
+      window.addEventListener("mouseup", mu);
+      window.addEventListener("touchmove", tm, { passive: false });
+      window.addEventListener("touchend", te);
+    };
+
+    handle.addEventListener("mousedown", (e) => { e.preventDefault(); e.stopPropagation(); startDrag(e.clientY); });
+    handle.addEventListener("touchstart", (e) => { e.preventDefault(); e.stopPropagation(); if (e.touches[0]) startDrag(e.touches[0].clientY); }, { passive: false });
+  }
+
+  // Keep on-screen on resize
+  window.addEventListener("resize", () => {
+    const rect = root.getBoundingClientRect();
+    const top = clamp(rect.top, 8, window.innerHeight - rect.height - 8);
+    root.style.top = top + "px";
+    root.style.right = "16px";
+    POS.top = top;
+    savePos(POS);
+  });
+
+  const fmt = n => "$"+Number(n).toLocaleString("en-US",{minimumFractionDigits:0,maximumFractionDigits:0});
+  const fmtInput = n => "$"+Number(n).toLocaleString("en-US");
+  const cts = o => o+"¢";
+  const pay = (a,o) => a&&o ? Math.round(a/(o/100)) : 0;
+  const cd = e => {
+    const d=new Date(e)-Date.now(); if(d<=0)return{h:"00",m:"00",s:"00"};
+    return{h:String(Math.floor(d/3600000)).padStart(2,"0"),m:String(Math.floor((d%3600000)/60000)).padStart(2,"0"),s:String(Math.floor((d%60000)/1000)).padStart(2,"0")};
+  };
+  const fD = e => {const d=new Date(e);return d.toLocaleDateString("en-US",{month:"short",day:"numeric"})+", "+d.toLocaleTimeString("en-US",{hour:"numeric",minute:"2-digit",timeZoneName:"short"})};
+
+  // Fixed top-right position for expanded screens
+  const EXPANDED_TOP = 12; // 12px below chrome bar
+
+  let _lastScreen = null;
+
+  function render(){
+    if(S.cdI){clearInterval(S.cdI);S.cdI=null}
+
+    // Position
+    if (S.screen === "collapsed") {
+      root.style.top = POS.top + "px";
+      root.style.transition = "top 0.25s ease";
+    } else {
+      root.style.top = EXPANDED_TOP + "px";
+      root.style.transition = "top 0.25s ease";
+    }
+    root.style.right = "16px";
+
+    const isExpanded = S.screen !== "collapsed";
+    const wasExpanded = _lastScreen && _lastScreen !== "collapsed";
+
+    if (isExpanded && wasExpanded) {
+      // SAME CARD — swap body content instantly, no opacity blink
+      const body = root.querySelector(".kalshi-card-body");
+      if (body) {
+        const newBody = getScreenBody();
+        body.innerHTML = newBody;
+        bindScreenEvents();
+      } else {
+        buildExpandedShell();
+        bindScreenEvents();
+      }
+      // Update back arrow
+      const bk=document.getElementById("k-bk");
+      if(bk) bk.style.visibility=S.screen==="market-detail"?"hidden":"visible";
+    } else if (isExpanded && !wasExpanded) {
+      // Collapsed → Expanded: build full card
+      buildExpandedShell();
+      bindScreenEvents();
+    } else {
+      // Collapsed screen
+      s1();
+    }
+
+    bindDragHandle();
+    _lastScreen = S.screen;
+    setTimeout(() => { root.style.transition = "none"; }, 300);
+  }
+
+  function buildExpandedShell(){
+    root.innerHTML = `
+    <div class="kalshi-widget-expanded">
+      <div class="kalshi-panel-header">
+        <img class="kalshi-header-back" id="k-bk" src="${S2_ICONS.arrow_back}" alt="←" style="visibility:${S.screen==='market-detail'?'hidden':'visible'}"/>
+        <img class="kalshi-panel-logo-img" src="${S2_ICONS.kalshi_logo}" alt="Kalshi"/>
+        <div class="kalshi-panel-header-actions">
+          <img class="kalshi-header-icon" src="${S2_ICONS.date_range}" alt="cal"/>
+          <img class="kalshi-header-icon" src="${S2_ICONS.add_circle}" alt="add"/>
+          <img class="kalshi-header-icon" id="k-x" src="${S2_ICONS.close}" alt="close"/>
+        </div>
+      </div>
+      <div class="kalshi-card-body" style="width:100%;display:flex;flex-direction:column;align-items:center;gap:20px">
+        ${getScreenBody()}
+      </div>
+    </div>`;
+  }
+
+  function getScreenBody(){
+    if(S.screen==="market-detail") return s2Body();
+    if(S.screen==="order-entry") return s3Body();
+    if(S.screen==="confirmation") return s4Body();
+    return "";
+  }
+
+  function bindScreenEvents(){
+    // Header events (always present)
+    const bk=document.getElementById("k-bk");
+    const xx=document.getElementById("k-x");
+    if(bk) bk.onclick=()=>{
+      if(S.screen==="order-entry"){S.screen="market-detail";render()}
+      else if(S.screen==="confirmation"){S.screen="order-entry";render()}
+    };
+    if(xx) xx.onclick=()=>{S.screen="collapsed";render()};
+    // Update back arrow visibility
+    if(bk) bk.style.visibility=S.screen==="market-detail"?"hidden":"visible";
+
+    // Screen-specific events
+    if(S.screen==="market-detail") bindS2();
+    if(S.screen==="order-entry") bindS3();
+    if(S.screen==="confirmation") bindS4();
+  }
+
+  const optIcon = (color) => {
+    if (color === "#FF8700") return S2_ICONS.icon_orange;
+    if (color === "#DC0000") return S2_ICONS.icon_red;
+    return S2_ICONS.icon_orange;
+  };
+
+  function s1(){
+    root.innerHTML = `
+    <div class="kalshi-widget-collapsed">
+      <div class="kalshi-collapsed-top">
+        <div class="kalshi-collapsed-logo">Kalshi</div>
+        <div class="kalshi-collapsed-subtitle">9.2k people are trading F1 <img class="kalshi-chevron-icon" src="${ICONS.chevron}" alt="v"/></div>
+      </div>
+      <div class="kalshi-collapsed-divider"></div>
+      <div class="kalshi-collapsed-body">
+        <div class="kalshi-collapsed-markets">
+          ${MARKETS.map(m => `
+            <div class="kalshi-collapsed-market-item" data-id="${m.id}">
+              <div class="kalshi-collapsed-market-avatar"><img class="kalshi-avatar-img" src="${m.img}" alt=""/></div>
+              <div class="kalshi-collapsed-market-text"><span class="kalshi-collapsed-market-title">${m.title}</span></div>
+              <img class="kalshi-arrow-icon" src="${ICONS.arrow}" alt="→"/>
+            </div>`).join("")}
+        </div>
+        <div class="kalshi-collapsed-ellipsis">
+          <img class="kalshi-ellipsis-icon" src="${ICONS.ellipsis}" alt="menu"/>
+        </div>
+      </div>
+    </div>`;
+    root.querySelectorAll(".kalshi-collapsed-market-item").forEach(el=>{
+      el.onclick=()=>{S.mkt=MARKETS.find(m=>m.id===el.dataset.id);S.screen="market-detail";render()};
+    });
+  }
+
+  /* ---- S2 Body (Market Detail) ---- */
+  function s2Body(){
+    const m=S.mkt,c=cd(m.endsAt);
+    return `
+      <div class="kalshi-market-title-bar">${m.title}</div>
+      <div class="kalshi-market-options">
+        ${m.options.map((o,i)=>`
+        <div class="kalshi-option-row">
+          <img class="kalshi-option-icon" src="${optIcon(o.color)}" alt=""/>
+          <span class="kalshi-option-name">${o.name}</span>
+          <span class="kalshi-option-odds">${o.odds}%
+            <span class="kalshi-odds-change"><img class="kalshi-odds-arrow" src="${S2_ICONS.polygon_up}" alt="↑"/>${Math.floor(Math.random()*5+1)}</span>
+          </span>
+          <div class="kalshi-option-buttons">
+            <button class="kalshi-yes-btn" data-i="${i}" data-s="yes">Yes</button>
+            <button class="kalshi-no-btn" data-i="${i}" data-s="no">No</button>
+          </div>
+        </div>`).join("")}
+      </div>
+      <div class="kalshi-market-meta">
+        <span class="kalshi-volume-text">$${m.volume} · Annually</span>
+        <span class="kalshi-more-markets">More markets →</span>
+      </div>
+      <button class="kalshi-buy-main-btn" id="k-buy">Buy</button>
+      <div class="kalshi-countdown-section">
+        <div class="kalshi-countdown-label">Begins In</div>
+        <div class="kalshi-countdown-timer">
+          <span id="cd-h">${c.h} h</span>
+          <span class="kalshi-countdown-sep">:</span>
+          <span id="cd-m">${c.m} m</span>
+          <span class="kalshi-countdown-sep">:</span>
+          <span id="cd-s">${c.s}s</span>
+        </div>
+        <div class="kalshi-countdown-date">${fD(m.endsAt)}</div>
+      </div>`;
+  }
+  function bindS2(){
+    const m=S.mkt;
+    S.cdI=setInterval(()=>{const c=cd(m.endsAt);const h=document.getElementById("cd-h"),mi=document.getElementById("cd-m"),s=document.getElementById("cd-s");if(h)h.textContent=c.h+" h";if(mi)mi.textContent=c.m+" m";if(s)s.textContent=c.s+"s"},1000);
+    root.querySelectorAll(".kalshi-yes-btn,.kalshi-no-btn").forEach(b=>{b.onclick=()=>{S.opt=m.options[+b.dataset.i];S.side=b.dataset.s;S.amt=0;S.screen="order-entry";render()}});
+    const buyBtn=document.getElementById("k-buy");
+    if(buyBtn) buyBtn.onclick=()=>{S.opt=m.options[0];S.side="yes";S.amt=0;S.screen="order-entry";render()};
+  }
+
+  /* ---- S3 Body (Order Entry) ---- */
+  function s3Body(){
+    const m=S.mkt,o=S.opt,side=S.side;
+    const yp=o.odds,np=100-o.odds,ap=side==="yes"?yp:np;
+    const py=Math.round(100/(yp/100)),pn=Math.round(100/(np/100));
+    const p=pay(S.amt,ap);
+    return `
+      <div class="kalshi-market-title-bar">${m.title}</div>
+      <div class="kalshi-order-section">
+        <div class="kalshi-green-container">
+          <div class="kalshi-selected-option">
+            <img class="kalshi-selected-icon" src="${optIcon(o.color)}" alt=""/>
+            <span class="kalshi-selected-label"><span class="side-tag ${side}">${side==="yes"?"Buy Yes":"Buy No"}</span><span class="opt-name"> · ${o.name}</span></span>
+          </div>
+          <div class="kalshi-toggle-row">
+            <div class="kalshi-toggle-frame">
+              <button class="kalshi-price-toggle-btn ${side==="yes"?"active-yes":""}" data-side="yes">Yes ${cts(yp)}</button>
+              <span class="kalshi-toggle-conversion">$100 → <span class="payout">${fmt(py)}</span></span>
+            </div>
+            <div class="kalshi-toggle-frame">
+              <button class="kalshi-price-toggle-btn ${side==="no"?"active-no":""}" data-side="no">No ${cts(np)}</button>
+              <span class="kalshi-toggle-conversion">$100 → <span class="payout">${fmt(pn)}</span></span>
+            </div>
+          </div>
+          <div class="kalshi-separator"></div>
+          <div class="kalshi-amount-section">
+            <div class="kalshi-amount-top">
+              <span class="kalshi-amount-label-row">
+                <span class="kalshi-amount-label">Dollars</span>
+                <img class="kalshi-dropdown-icon" src="${S2_ICONS.dropdown}" alt="▾"/>
+              </span>
+              <input type="text" inputmode="numeric" pattern="[0-9]*" class="kalshi-amount-input ${S.amt>0?'has-value':''}" id="k-amt" placeholder="$0" value="${S.amt>0?fmtInput(S.amt):''}"/>
+            </div>
+            <span class="kalshi-interest-badge">Earn 3.75% Interest</span>
+          </div>
+          <div class="kalshi-order-summary" id="k-summary" style="display:${S.amt>0?'flex':'none'}">
+            <div class="kalshi-order-summary-row">
+              <span class="kalshi-order-summary-label">Odds</span>
+              <span class="kalshi-order-summary-value" id="k-odds">${ap}% chance</span>
+            </div>
+            <div class="kalshi-order-summary-row">
+              <span class="kalshi-order-summary-label">Payout if ${side==="yes"?"Yes":"No"}</span>
+              <span class="kalshi-order-summary-value payout" id="k-payout">${fmt(p)}</span>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;width:100%">
+          <button class="kalshi-buy-order-btn" id="k-go" ${S.amt>0?'':'disabled'}>Buy</button>
+          <button class="kalshi-gpay-btn" id="k-gpay">
+            <span class="kalshi-gpay-content">
+              <img class="kalshi-gpay-icon" src="${S2_ICONS.google}" alt="G"/>
+              <span class="kalshi-gpay-text">Pay</span>
+            </span>
+            <span class="kalshi-gpay-sep"></span>
+            <span class="kalshi-gpay-card">
+              <img class="kalshi-gpay-card-icon" src="${S2_ICONS.payment_card}" alt=""/>
+              <span class="kalshi-gpay-card-num">····1689</span>
+            </span>
+          </button>
+        </div>
+      </div>`;
+  }
+  function bindS3(){
+    const o=S.opt,yp=o.odds,np=100-o.odds;
+    const inp=document.getElementById("k-amt");
+    const summary=document.getElementById("k-summary");
+    const oddsEl=document.getElementById("k-odds");
+    const payoutEl=document.getElementById("k-payout");
+    const buyBtn=document.getElementById("k-go");
+    function updateBtnState(num){ buyBtn.disabled=!(num>0); }
+    updateBtnState(S.amt);
+    // Toggle Yes/No in-place (no re-render)
+    const sideTag=root.querySelector(".kalshi-selected-label .side-tag");
+    root.querySelectorAll(".kalshi-price-toggle-btn").forEach(b=>{b.onclick=()=>{
+      const ns=b.dataset.side; S.side=ns;
+      root.querySelectorAll(".kalshi-price-toggle-btn").forEach(btn=>{
+        btn.classList.remove("active-yes","active-no");
+        if(btn.dataset.side===ns) btn.classList.add(ns==="yes"?"active-yes":"active-no");
+      });
+      if(sideTag){sideTag.textContent=ns==="yes"?"Buy Yes":"Buy No";sideTag.className="side-tag "+ns;}
+      const nAp=ns==="yes"?yp:100-yp, nPay=pay(S.amt,nAp);
+      if(oddsEl)oddsEl.textContent=nAp+'% chance';
+      if(payoutEl)payoutEl.textContent=fmt(nPay);
+      const pL=root.querySelectorAll(".kalshi-order-summary-label");
+      if(pL.length>1)pL[1].textContent="Payout if "+(ns==="yes"?"Yes":"No");
+    }});
+    inp.addEventListener("input",e=>{
+      let raw=e.target.value.replace(/[^0-9]/g,''),num=parseInt(raw)||0;
+      if(num>1000000000)num=1000000000; S.amt=num;
+      e.target.value=num>0?'$'+num.toLocaleString('en-US'):'';
+      e.target.classList.toggle('has-value',num>0);
+      if(num>0)setTimeout(()=>e.target.setSelectionRange(e.target.value.length,e.target.value.length),0);
+      const cAp=S.side==="yes"?yp:100-yp,cPay=pay(num,cAp);
+      if(num>0){summary.style.display='flex';oddsEl.textContent=cAp+'% chance';payoutEl.textContent=fmt(cPay)}
+      else{summary.style.display='none'}
+      updateBtnState(num);
+    });
+    inp.addEventListener("focus",()=>{if(!inp.value)inp.value='$';setTimeout(()=>inp.setSelectionRange(inp.value.length,inp.value.length),0)});
+    inp.addEventListener("blur",()=>{if(inp.value==='$'||inp.value==='$0'){inp.value='';inp.classList.remove('has-value');S.amt=0;summary.style.display='none';updateBtnState(0)}});
+    setTimeout(()=>inp.focus(),150);
+    buyBtn.onclick=()=>{
+      if(!S.amt)return;
+      const cAp=S.side==="yes"?yp:100-yp;
+      buyBtn.textContent="Placing order...";
+      setTimeout(()=>{S.order={option:o.name,side:S.side,amount:S.amt||0,odds:cAp,payout:pay(S.amt,cAp),color:o.color};S.screen="confirmation";render()},800);
+    };
+    document.getElementById("k-gpay").onclick=()=>{
+      const cAp=S.side==="yes"?yp:100-yp,totalAmt=S.amt||0;
+      const overlay=document.createElement("div");
+      overlay.className="kalshi-gpay-overlay";
+      overlay.innerHTML=`
+        <div class="kalshi-gpay-modal">
+          <div class="kalshi-gpay-modal-header">
+            <div class="kalshi-gpay-modal-graphic">
+              <div class="kalshi-gpay-modal-confetti">
+                <div class="kalshi-gpay-confetti-dot" style="top:8px;left:55%;width:8px;height:8px;background:#4285F4;transform:rotate(20deg)"></div>
+                <div class="kalshi-gpay-confetti-dot" style="top:15px;right:15%;width:6px;height:10px;background:#34A853;transform:rotate(-15deg)"></div>
+                <div class="kalshi-gpay-confetti-dot" style="top:5px;right:25%;width:10px;height:6px;background:#34A853;transform:rotate(45deg)"></div>
+                <div class="kalshi-gpay-confetti-dot" style="bottom:25%;left:5%;width:4px;height:4px;background:#FBBC04;border-radius:50%"></div>
+                <div class="kalshi-gpay-confetti-dot" style="top:30%;right:5%;width:3px;height:8px;background:#EA4335;transform:rotate(-30deg)"></div>
+                <div class="kalshi-gpay-confetti-dot" style="top:20%;left:10%;width:6px;height:3px;background:#FBBC04;transform:rotate(60deg)"></div>
+              </div>
+              <span class="kalshi-gpay-lock">🔒</span>
+              <span class="kalshi-gpay-fingerprint">🔵</span>
+              <span class="kalshi-gpay-check">✓</span>
+            </div>
+            <div class="kalshi-gpay-modal-title">Use Touch ID to verify and complete your purchase?</div>
+          </div>
+          <div class="kalshi-gpay-modal-body">
+            <div class="kalshi-gpay-modal-row"><span class="kalshi-gpay-modal-label">Store</span><span class="kalshi-gpay-modal-val">kalshi.com</span></div>
+            <div class="kalshi-gpay-modal-row"><span class="kalshi-gpay-modal-label">Payment</span><span class="kalshi-gpay-modal-val"><img class="kalshi-gpay-modal-card-icon" src="${S2_ICONS.payment_card}" alt=""/>Mastercard ····1689</span></div>
+            <div class="kalshi-gpay-modal-row"><span class="kalshi-gpay-modal-label">Total</span><span class="kalshi-gpay-modal-val" style="font-weight:600;color:rgba(0,0,0,0.87)">USD ${fmt(totalAmt)}</span></div>
+          </div>
+          <div class="kalshi-gpay-modal-footer">
+            <button class="kalshi-gpay-modal-cancel" id="k-gpay-cancel">Cancel</button>
+            <button class="kalshi-gpay-modal-verify" id="k-gpay-verify">Verify</button>
+          </div>
+        </div>`;
+      document.body.appendChild(overlay);
+      overlay.addEventListener("click",e=>{if(e.target===overlay)overlay.remove()});
+      document.getElementById("k-gpay-cancel").onclick=()=>overlay.remove();
+      document.getElementById("k-gpay-verify").onclick=()=>{
+        const vb=document.getElementById("k-gpay-verify");vb.textContent="Verifying...";vb.disabled=true;
+        setTimeout(()=>{overlay.remove();S.order={option:o.name,side:S.side,amount:totalAmt,odds:cAp,payout:pay(totalAmt,cAp),color:o.color};S.screen="confirmation";render()},1000);
+      };
+    };
+  }
+
+  /* ---- S4 Body (Confirmation) ---- */
+  function s4Body(){
+    const o=S.order;
+    return `
+      <div class="kalshi-confirmation">
+        <div class="kalshi-confirmation-title">Order completed!</div>
+        <div class="kalshi-confirmation-card">
+          <div class="kalshi-conf-market-title">${S.mkt?S.mkt.title:'Gran Premio de Mexico Winner?'}</div>
+          <div class="kalshi-conf-option">
+            <img class="kalshi-conf-option-icon" src="${optIcon(o.color)}" alt=""/>
+            <span class="kalshi-conf-option-name">${o.option}</span>
+          </div>
+          <div class="kalshi-conf-separator"></div>
+          <div class="kalshi-conf-details">
+            <div class="kalshi-conf-row"><span class="kalshi-conf-label">Odds</span><span class="kalshi-conf-value">${o.odds}% chance</span></div>
+            <div class="kalshi-conf-row"><span class="kalshi-conf-label">Cost</span><span class="kalshi-conf-value">${fmt(o.amount)}</span></div>
+            <div class="kalshi-conf-row"><span class="kalshi-conf-label">Payout if ${o.side==="yes"?"Yes":"No"}</span><span class="kalshi-conf-value payout">${fmt(o.payout)}</span></div>
+          </div>
+        </div>
+        <button class="kalshi-done-btn" id="k-done">Done</button>
+      </div>
+      <div class="kalshi-related-section">
+        <div class="kalshi-related-title">People are also buying</div>
+        ${RELATED.map(r=>`<div class="kalshi-related-item" data-id="${r.id}"><img class="kalshi-related-img" src="${r.img}" alt=""/><span class="kalshi-related-name">${r.title}</span><span class="kalshi-related-arrow">›</span></div>`).join("")}
+      </div>`;
+  }
+  function bindS4(){
+    document.getElementById("k-done").onclick=()=>{S.screen="collapsed";S.mkt=null;S.opt=null;S.amt=0;S.order=null;render()};
+    root.querySelectorAll(".kalshi-related-item").forEach(el=>{el.onclick=()=>{const mk=MARKETS.find(m=>m.id===el.dataset.id);if(mk){S.mkt=mk;S.screen="market-detail";render()}}});
+  }
+
+  render();
+})();
+</script>
+</body>
+</html>
+Add index.html
