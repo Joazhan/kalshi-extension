@@ -7,11 +7,18 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
   /*
-    Font source: C:\Users\joann\Project1\Fonts\Inter.zip\static
+    Font sources:
+    - Inter: C:\Users\joann\Project1\Fonts\Inter.zip\static
+    - Orbitron: C:\Users\joann\Project1\Fonts\Inter,Orbitron.zip\Orbitron
     For Chrome extension, fonts are loaded from local extension directory.
     For preview fallback, Google Fonts CDN is imported below.
   */
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap');
+
+  /*
+    Orbitron font source: C:\Users\joann\Project1\Fonts\Inter,Orbitron.zip\Orbitron
+    Used for F1 website elements. Save this reference for future font iterations.
+  */
 
   @font-face {
     font-family: 'Inter';
@@ -59,7 +66,7 @@
     padding: 0;
     width: 100%;
     min-height: 100vh;
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Orbitron', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     background: #111119;
     color: #e0e0e0;
     overflow-x: hidden;
@@ -138,57 +145,77 @@
   .sim-nav-right {
     display: flex;
     align-items: center;
-    gap: 16px;
+    gap: 10px;
     margin-left: auto;
     flex-shrink: 0;
   }
-  .sim-nav-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: rgba(255,255,255,0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: #888;
-    font-size: 14px;
+  .sim-nav-btn {
+    padding: 8px 16px;
+    border-radius: 100px;
+    font-family: 'Inter', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
     cursor: pointer;
+    border: none;
+    white-space: nowrap;
+  }
+  .sim-nav-btn-signin {
+    background: #000;
+    color: #fff;
+    border: 1px solid rgba(255,255,255,0.2);
+  }
+  .sim-nav-btn-subscribe {
+    background: #e10600;
+    color: #fff;
   }
 
-  /* Sub-nav / Breadcrumb bar */
+  /* Sub-nav / Second navbar */
   .sim-subnav {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 12px 40px;
+    padding: 8px 40px;
     background: #1a1a24;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
+    border-bottom: 1px solid rgba(255,255,255,0.08);
   }
   .sim-subnav-left {
     display: flex;
-    align-items: center;
-    gap: 16px;
+    flex-direction: column;
+    gap: 2px;
   }
-  .sim-breadcrumb-item {
-    font-size: 13px;
-    color: #777;
+  .sim-subnav-top-row {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.6);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .sim-subnav-top-row .divider {
+    color: rgba(255,255,255,0.2);
+  }
+  .sim-subnav-bottom-row {
     display: flex;
     align-items: center;
     gap: 6px;
-  }
-  .sim-breadcrumb-item .dot { color: #e10600; font-size: 8px; }
-  .sim-race-timer {
-    font-family: 'Inter', monospace;
-    font-size: 14px;
+    font-family: 'Orbitron', sans-serif;
+    font-size: 13px;
     font-weight: 700;
     color: #fff;
-    display: flex;
-    align-items: center;
-    gap: 4px;
   }
-  .sim-race-timer span.label { font-style: italic; margin-right: 8px; }
-  .sim-race-timer span.num { color: #ccc; }
-  .sim-race-timer span.unit { color: #555; font-weight: 400; font-size: 11px; }
+  .sim-subnav-bottom-row .flag {
+    font-size: 14px;
+  }
+  .sim-subnav-bottom-row .chevron {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    margin-left: 2px;
+  }
   .sim-subnav-right {
     display: flex;
     align-items: center;
@@ -202,6 +229,33 @@
     color: #555;
     text-transform: uppercase;
     letter-spacing: 0.5px;
+  }
+  .sim-subnav-time-block {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+  }
+  .sim-subnav-time-label {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 8px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.4);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .sim-subnav-time-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+  }
+  .sim-subnav-dot {
+    width: 6px;
+    height: 6px;
+    background: #e10600;
+    border-radius: 50%;
+    margin-right: 4px;
   }
 
   /* Main content area — two column desktop layout */
@@ -252,12 +306,14 @@
 
   /* Article sub-text */
   .sim-subhead {
+    font-family: 'Inter', sans-serif;
     font-size: 17px;
     color: rgba(255,255,255,0.45);
     line-height: 1.65;
     margin-bottom: 16px;
   }
   .sim-time {
+    font-family: 'Inter', sans-serif;
     font-size: 13px;
     color: rgba(255,255,255,0.2);
     margin-bottom: 32px;
@@ -282,6 +338,7 @@
     margin: 0 auto;
   }
   .sim-article-body p {
+    font-family: 'Inter', sans-serif;
     font-size: 15px;
     color: #FFFFFF;
     line-height: 1.75;
@@ -299,7 +356,7 @@
     position: fixed;
     top: 12px;
     left: 0;
-    width: 100vw;
+    width: 100%;
     display: flex;
     justify-content: flex-end;
     z-index: 2147483647;
@@ -479,7 +536,7 @@
     .kalshi-widget-expanded {
       width: min(424px, calc(100vw - 48px));
     }
-    #kalshi-ext-root { left: 0; width: 100vw; }
+    #kalshi-ext-root { left: 0; width: 100%; }
     .sim-sidebar { display: none; }
   }
 
@@ -492,7 +549,7 @@
     }
     #kalshi-ext-root {
       left: 0;
-      width: 100vw;
+      width: 100%;
       justify-content: center;
     }
     .kalshi-collapsed-top {
@@ -525,12 +582,11 @@
     flex-direction: column;
     align-items: center;
     gap: 20px;
-    border-radius: 16px 0 0 16px;
+    border-radius: 16px;
     border: 1px solid rgba(0, 0, 0, 0.10);
-    border-right: none;
     background: #FFF;
     box-shadow: 0 25px 7px 0 rgba(0,0,0,0.00), 0 16px 6px 0 rgba(0,0,0,0.01), 0 9px 5px 0 rgba(0,0,0,0.02), 0 4px 4px 0 rgba(0,0,0,0.03), 0 1px 2px 0 rgba(0,0,0,0.04);
-    margin-right: 0;
+    margin-right: 16px;
   }
 
   /* Header row: back | Kalshi logo | calendar + add + close */
@@ -961,24 +1017,35 @@
     <a href="#">F1 Members' Area</a>
   </div>
   <div class="sim-nav-right">
-    <div class="sim-nav-icon">🔍</div>
-    <div class="sim-nav-icon">👤</div>
+    <button class="sim-nav-btn sim-nav-btn-signin">Sign In</button>
+    <button class="sim-nav-btn sim-nav-btn-subscribe">Subscribe</button>
   </div>
 </nav>
 
 <!-- Sub-nav -->
+<!-- Sub-nav / Second navbar -->
 <div class="sim-subnav">
   <div class="sim-subnav-left">
-    <span class="sim-breadcrumb-item"><span class="dot">●</span> Mexico ›</span>
-    <div class="sim-race-timer">
-      <span class="label">Race</span>
-      <span class="num">12</span><span class="unit">H</span>
-      <span class="num">15</span><span class="unit">M</span>
-      <span class="num">04</span><span class="unit">S</span>
+    <div class="sim-subnav-top-row">
+      <span>R01</span>
+      <span class="divider">|</span>
+      <span>05 – 07 MAR</span>
+    </div>
+    <div class="sim-subnav-bottom-row">
+      <span class="flag">🇦🇺</span>
+      <span>Australia</span>
+      <span class="chevron">›</span>
     </div>
   </div>
   <div class="sim-subnav-right">
-    <span class="sim-tag-sponsor">MY TIME · TRACK TIME</span>
+    <div class="sim-subnav-time-block">
+      <span class="sim-subnav-time-label"><span class="sim-subnav-dot" style="display:inline-block;vertical-align:middle;"></span> My Time</span>
+      <span class="sim-subnav-time-value">21:17</span>
+    </div>
+    <div class="sim-subnav-time-block">
+      <span class="sim-subnav-time-label">Track Time</span>
+      <span class="sim-subnav-time-value">16:17</span>
+    </div>
   </div>
 </div>
 
