@@ -545,34 +545,84 @@
   }
 
   @media (max-width: 600px) {
-    .kalshi-widget-collapsed {
-      width: calc(100vw - 32px);
-    }
-    .kalshi-widget-expanded {
-      width: calc(100vw - 32px);
-    }
+    /* Bottom-sheet positioning — CSS !important overrides inline JS styles */
     #kalshi-ext-root {
-      left: 0;
-      width: 100%;
+      top: auto !important;
+      bottom: 0 !important;
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
       justify-content: center;
+      align-items: flex-end;
+    }
+    /* Collapsed widget: full-width, rounded top corners */
+    .kalshi-widget-collapsed {
+      width: 100%;
+      max-width: 100%;
+      border-radius: 20px 20px 0 0;
     }
     .kalshi-collapsed-top {
-      padding: 14px 16px 0 16px;
+      padding: 16px 20px 0 20px;
+    }
+    .kalshi-collapsed-ellipsis {
+      display: none;
     }
     .kalshi-collapsed-divider {
-      margin: 8px 16px;
+      margin: 8px 20px;
     }
     .kalshi-collapsed-body {
-      padding: 0 16px 14px 16px;
+      padding: 0 20px 16px 20px;
     }
     .kalshi-collapsed-logo {
-      font-size: 26px;
+      font-size: 28px;
     }
     .kalshi-collapsed-subtitle {
-      font-size: 13px;
+      font-size: 14px;
     }
     .kalshi-collapsed-market-title {
-      font-size: 13px;
+      font-size: 14px;
+    }
+    /* Expanded widget: full-width, scrollable, rounded top corners */
+    .kalshi-widget-expanded {
+      width: 100%;
+      max-width: 100%;
+      margin-right: 0;
+      border-radius: 20px 20px 0 0;
+      max-height: 90vh;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 16px 16px env(safe-area-inset-bottom, 16px) 16px;
+    }
+    .kalshi-market-title-bar {
+      font-size: 17px;
+      line-height: 24px;
+    }
+    .kalshi-yes-btn,
+    .kalshi-no-btn {
+      padding: 8px 14px;
+      min-height: 44px;
+      line-height: 1.4;
+    }
+    .kalshi-buy-main-btn,
+    .kalshi-buy-order-btn,
+    .kalshi-done-btn {
+      padding: 14px 10px;
+      min-height: 52px;
+      font-size: 17px;
+    }
+    .kalshi-gpay-btn {
+      padding: 14px 10px;
+      min-height: 52px;
+    }
+    .kalshi-amount-input {
+      font-size: 24px;
+      line-height: 32px;
+    }
+    .kalshi-confirmation-title {
+      font-size: 18px;
+    }
+    .kalshi-gpay-modal {
+      width: calc(100vw - 40px);
     }
   }
 
@@ -1141,11 +1191,16 @@ const RELATED = [
   };
   const savePos = (p) => { try { localStorage.setItem(DRAG_KEY, JSON.stringify({ top: p.top })); } catch {} };
 
+  const isMobile = () => window.innerWidth <= 600;
+
   const POS = loadPos();
-  root.style.top = POS.top + "px";
-  root.style.right = "16px";
+  if (!isMobile()) {
+    root.style.top = POS.top + "px";
+    root.style.right = "16px";
+  }
 
   function bindDragHandle() {
+    if (isMobile()) return;
     const handle = root.querySelector(".kalshi-collapsed-ellipsis");
     if (!handle || handle.dataset.dragBound === "1") return;
     handle.dataset.dragBound = "1";
@@ -1190,8 +1245,9 @@ const RELATED = [
     handle.addEventListener("touchstart", (e) => { e.preventDefault(); e.stopPropagation(); if (e.touches[0]) startDrag(e.touches[0].clientY); }, { passive: false });
   }
 
-  // Keep on-screen on resize
+  // Keep on-screen on resize (desktop only)
   window.addEventListener("resize", () => {
+    if (isMobile()) return;
     const rect = root.getBoundingClientRect();
     const top = clamp(rect.top, 8, window.innerHeight - rect.height - 8);
     root.style.top = top + "px";
@@ -1218,10 +1274,12 @@ const RELATED = [
   function render(){
     if(S.cdI){clearInterval(S.cdI);S.cdI=null}
 
-    // Position — always follow the widget's dragged position
-    root.style.top = POS.top + "px";
-    root.style.transition = "top 0.25s ease";
-    root.style.right = "16px";
+    // Position — follow widget's dragged position (desktop only; mobile handled by CSS)
+    if (!isMobile()) {
+      root.style.top = POS.top + "px";
+      root.style.transition = "top 0.25s ease";
+      root.style.right = "16px";
+    }
 
     const isExpanded = S.screen !== "collapsed";
     const wasExpanded = _lastScreen && _lastScreen !== "collapsed";
@@ -1251,7 +1309,7 @@ const RELATED = [
 
     bindDragHandle();
     _lastScreen = S.screen;
-    setTimeout(() => { root.style.transition = "none"; }, 300);
+    if (!isMobile()) setTimeout(() => { root.style.transition = "none"; }, 300);
   }
 
   function buildExpandedShell(){
