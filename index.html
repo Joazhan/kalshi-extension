@@ -381,6 +381,7 @@
       0 2px 8px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
+    position: relative;
   }
 
   @keyframes kalshi-slideIn {
@@ -390,7 +391,7 @@
 
   /* Top section — Logo + Subtitle */
   .kalshi-collapsed-top {
-    padding: 16px 42px 0 20px;
+    padding: 16px 48px 0 20px;
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -507,14 +508,17 @@
     transform: translateX(2px);
   }
 
-  /* Ellipsis — pushed to far right, vertically centered */
+  /* Ellipsis — absolutely centered on the full widget height */
   .kalshi-collapsed-ellipsis {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
     display: flex;
     align-items: center;
     flex-shrink: 0;
     cursor: pointer;
-    margin-left: auto;
-    padding: 8px 0;
+    padding: 0 12px;
     transition: opacity 0.15s;
   }
 
@@ -1214,14 +1218,9 @@ const RELATED = [
   function render(){
     if(S.cdI){clearInterval(S.cdI);S.cdI=null}
 
-    // Position
-    if (S.screen === "collapsed") {
-      root.style.top = POS.top + "px";
-      root.style.transition = "top 0.25s ease";
-    } else {
-      root.style.top = EXPANDED_TOP + "px";
-      root.style.transition = "top 0.25s ease";
-    }
+    // Position — always follow the widget's dragged position
+    root.style.top = POS.top + "px";
+    root.style.transition = "top 0.25s ease";
     root.style.right = "16px";
 
     const isExpanded = S.screen !== "collapsed";
