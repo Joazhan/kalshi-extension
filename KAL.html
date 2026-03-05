@@ -1310,17 +1310,6 @@ const RELATED = [
     bindDragHandle();
     _lastScreen = S.screen;
     if (!isMobile()) setTimeout(() => { root.style.transition = "none"; }, 300);
-
-    // After rendering an expanded card, clamp top so it doesn't overflow the viewport
-    if (!isMobile() && isExpanded) {
-      requestAnimationFrame(() => {
-        const rect = root.getBoundingClientRect();
-        const maxTop = window.innerHeight - rect.height - 8;
-        if (POS.top > maxTop) {
-          root.style.top = Math.max(8, maxTop) + "px";
-        }
-      });
-    }
   }
 
   function buildExpandedShell(){
