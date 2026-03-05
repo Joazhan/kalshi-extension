@@ -170,6 +170,9 @@
     background: #e10600;
     color: #fff;
   }
+  /* Mobile-only nav elements — hidden on desktop */
+  .sim-nav-hamburger { display: none; }
+  .sim-nav-fia { display: none; }
 
   /* Sub-nav / Second navbar */
   .sim-subnav {
@@ -545,42 +548,102 @@
   }
 
   @media (max-width: 600px) {
-    /* Bottom-sheet positioning — CSS !important overrides inline JS styles */
+    /* ── F1 Nav: hamburger style ── */
+    .sim-nav {
+      padding: 0 16px;
+      justify-content: space-between;
+    }
+    .sim-nav-logo { margin-right: 0; }
+    .sim-nav-links { display: none; }
+    .sim-nav-right { display: none; }
+    .sim-nav-hamburger {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 6px;
+    }
+    .sim-nav-fia {
+      display: flex;
+      align-items: center;
+    }
+
+    /* ── Page layout: 24px side margins ── */
+    .sim-main {
+      width: 100%;
+      max-width: 100%;
+      padding: 20px 24px 80px;
+    }
+    .sim-article-body {
+      max-width: 100%;
+    }
+
+    /* ── Typography ── */
+    .sim-headline {
+      font-size: 24px;
+      letter-spacing: -0.5px;
+    }
+    .sim-article-body p {
+      font-size: 16px;
+    }
+
+    /* ── Kalshi widget: stay on right, not bottom-sheet ── */
     #kalshi-ext-root {
-      top: auto !important;
-      bottom: 0 !important;
+      top: 12px !important;
+      bottom: auto !important;
       left: 0 !important;
       right: 0 !important;
       width: 100% !important;
-      justify-content: center;
-      align-items: flex-end;
+      justify-content: flex-end;
+      align-items: flex-start;
     }
-    /* Collapsed widget: full-width, rounded top corners */
+    /* Collapsed widget: keep right-side shape */
     .kalshi-widget-collapsed {
-      width: 100%;
-      max-width: 100%;
-      border-radius: 20px 20px 0 0;
+      width: min(300px, calc(100vw - 24px));
+      max-width: min(300px, calc(100vw - 24px));
+      border-radius: 16px 0 0 16px;
     }
     .kalshi-collapsed-top {
-      padding: 16px 20px 0 20px;
+      padding: 10px 14px 0 12px;
+      gap: 4px;
     }
     .kalshi-collapsed-ellipsis {
       display: none;
     }
     .kalshi-collapsed-divider {
-      margin: 8px 20px;
+      margin: 6px 12px;
     }
     .kalshi-collapsed-body {
-      padding: 0 20px 16px 20px;
+      padding: 0 12px 10px 12px;
+    }
+    .kalshi-collapsed-markets {
+      gap: 6px;
+    }
+    .kalshi-collapsed-market-item {
+      gap: 8px;
+    }
+    .kalshi-collapsed-market-avatar {
+      width: 22px;
+      height: 22px;
     }
     .kalshi-collapsed-logo {
-      font-size: 28px;
+      font-size: 20px;
     }
     .kalshi-collapsed-subtitle {
-      font-size: 14px;
+      font-size: 11px;
     }
     .kalshi-collapsed-market-title {
-      font-size: 14px;
+      font-size: 11px;
+    }
+    .kalshi-chevron-icon {
+      width: 11px;
+      height: 11px;
+    }
+    .kalshi-arrow-icon {
+      width: 11px;
+      height: 11px;
     }
     /* Expanded widget: full-width, scrollable, rounded top corners */
     .kalshi-widget-expanded {
@@ -1074,6 +1137,20 @@
     <button class="sim-nav-btn sim-nav-btn-signin">Sign In</button>
     <button class="sim-nav-btn sim-nav-btn-subscribe">Subscribe</button>
   </div>
+  <!-- Mobile-only: hamburger + FIA badge -->
+  <button class="sim-nav-hamburger" aria-label="Menu">
+    <svg width="20" height="16" viewBox="0 0 20 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="0" y="0" width="20" height="2" rx="1" fill="#ffffff"/>
+      <rect x="0" y="7" width="20" height="2" rx="1" fill="#ffffff"/>
+      <rect x="0" y="14" width="20" height="2" rx="1" fill="#ffffff"/>
+    </svg>
+  </button>
+  <span class="sim-nav-fia">
+    <svg width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="17" cy="17" r="16" stroke="#999" stroke-width="1.5" fill="none"/>
+      <text x="17" y="20" text-anchor="middle" font-family="Inter, sans-serif" font-size="7.5" font-weight="700" fill="#bbb" letter-spacing="0.8">FIA</text>
+    </svg>
+  </span>
 </nav>
 
 <!-- Sub-nav -->
@@ -1279,6 +1356,12 @@ const RELATED = [
       root.style.top = POS.top + "px";
       root.style.transition = "top 0.25s ease";
       root.style.right = "16px";
+      // After render, re-clamp so expanded widget never overflows below viewport
+      requestAnimationFrame(() => {
+        const h = root.getBoundingClientRect().height;
+        const clampedTop = clamp(POS.top, 8, window.innerHeight - h - 8);
+        root.style.top = clampedTop + "px";
+      });
     }
 
     const isExpanded = S.screen !== "collapsed";
