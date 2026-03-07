@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Kalshi Extension — Desktop Preview</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <style>
@@ -367,8 +367,33 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     pointer-events: none;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
   }
   #kalshi-ext-root > * { pointer-events: auto; }
+
+  /* iOS Safari: remove tap flash and enable fast tap on all interactive elements */
+  #kalshi-ext-root button,
+  #kalshi-ext-root .kalshi-collapsed-market-item,
+  #kalshi-ext-root .kalshi-collapsed-subtitle,
+  #kalshi-ext-root .kalshi-collapsed-ellipsis,
+  #kalshi-ext-root .kalshi-yes-btn,
+  #kalshi-ext-root .kalshi-no-btn,
+  #kalshi-ext-root .kalshi-price-toggle-btn,
+  #kalshi-ext-root .kalshi-related-item,
+  #kalshi-ext-root .kalshi-market-meta {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+
+  /* iOS: re-enable text selection and fix input styling */
+  #kalshi-ext-root input {
+    -webkit-user-select: text;
+    user-select: text;
+    -webkit-appearance: none;
+    appearance: none;
+  }
 
   /* ==========================================================
      SCREEN 1 — Green collapsed card
@@ -1536,26 +1561,43 @@ const RELATED = [
         window.removeEventListener("mousemove", mm);
         window.removeEventListener("mouseup", mu);
         window.removeEventListener("touchmove", tm, { passive: false });
-        window.removeEventListener("touchend", te);
+        window.removeEventListener("touchend", te, { passive: true });
+        window.removeEventListener("touchcancel", te, { passive: true });
         if (rafId) { cancelAnimationFrame(rafId); rafId = null; }
         handle.style.cursor = "grab";
         root.style.willChange = "auto";
+        // iOS: restore page scroll after drag ends
+        document.body.style.overflow = "";
+        document.body.style.touchAction = "";
         savePos(POS);
       };
 
       const mm = (e) => { e.preventDefault(); onMove(e.clientY); };
       const mu = () => end();
-      const tm = (e) => { e.preventDefault(); if (e.touches[0]) onMove(e.touches[0].clientY); };
+      const tm = (e) => {
+        e.preventDefault(); // iOS: prevents page scroll during widget drag
+        e.stopPropagation();
+        if (e.touches[0]) onMove(e.touches[0].clientY);
+      };
       const te = () => end();
 
       window.addEventListener("mousemove", mm);
       window.addEventListener("mouseup", mu);
       window.addEventListener("touchmove", tm, { passive: false });
-      window.addEventListener("touchend", te);
+      window.addEventListener("touchend", te, { passive: true });
+      window.addEventListener("touchcancel", te, { passive: true }); // iOS: handle interrupted touches (call/alert)
     };
 
     handle.addEventListener("mousedown", (e) => { e.preventDefault(); e.stopPropagation(); startDrag(e.clientY); });
-    handle.addEventListener("touchstart", (e) => { e.preventDefault(); e.stopPropagation(); if (e.touches[0]) startDrag(e.touches[0].clientY); }, { passive: false });
+    handle.addEventListener("touchstart", (e) => {
+      e.preventDefault(); // must be non-passive to block iOS page scroll
+      e.stopPropagation();
+      if (e.touches[0]) {
+        document.body.style.overflow = "hidden"; // iOS: lock page scroll while dragging
+        document.body.style.touchAction = "none";
+        startDrag(e.touches[0].clientY);
+      }
+    }, { passive: false });
   }
 
   // Keep on-screen on resize
@@ -1687,7 +1729,7 @@ const RELATED = [
       <div class="kalshi-collapsed-body">
         <div class="kalshi-collapsed-markets">
           ${MARKETS.map(m => `
-            <div class="kalshi-collapsed-market-item" data-id="${m.id}">
+            <div class="kalshi-collapsed-market-item" role="button" tabindex="0" data-id="${m.id}">
               <div class="kalshi-collapsed-market-avatar"><img class="kalshi-avatar-img" src="${m.img}" alt=""/></div>
               <div class="kalshi-collapsed-market-text"><span class="kalshi-collapsed-market-title">${m.title}</span></div>
               <img class="kalshi-arrow-icon" src="${ICONS.arrow}" alt="→"/>
@@ -1702,16 +1744,23 @@ const RELATED = [
     <div class="kalshi-widget-collapsed">
       <div class="kalshi-collapsed-top"${collapsedTopStyle}>
         <div class="kalshi-collapsed-logo">Kalshi</div>
-        <div class="kalshi-collapsed-subtitle" id="kalshi-subtitle-toggle">9.2k people are trading F1 <img class="kalshi-chevron-icon${S.listCollapsed ? " kalshi-chevron-up" : ""}" src="${ICONS.chevron}" alt="v"/></div>
+        <div class="kalshi-collapsed-subtitle" role="button" tabindex="0" id="kalshi-subtitle-toggle">9.2k people are trading F1 <img class="kalshi-chevron-icon${S.listCollapsed ? " kalshi-chevron-up" : ""}" src="${ICONS.chevron}" alt="v"/></div>
         ${S.listCollapsed ? `<div class="kalshi-collapsed-ellipsis kalshi-ellipsis-inline"><img class="kalshi-ellipsis-icon" src="${ICONS.ellipsis}" alt="menu"/></div>` : ""}
       </div>
       ${bodyHtml}
     </div>`;
     root.querySelectorAll(".kalshi-collapsed-market-item").forEach(el=>{
-      el.onclick=()=>{S.mkt=MARKETS.find(m=>m.id===el.dataset.id);S.screen="market-detail";render();};
+      const goMarket = () => { S.mkt=MARKETS.find(m=>m.id===el.dataset.id); S.screen="market-detail"; render(); };
+      el.onclick = goMarket;
+      // iOS Safari: touchend fires faster than click (no 300ms delay)
+      el.addEventListener("touchend", (e) => { e.preventDefault(); goMarket(); }, { passive: false });
     });
     const toggle = root.querySelector("#kalshi-subtitle-toggle");
-    if (toggle) toggle.onclick = () => { S.listCollapsed = !S.listCollapsed; s1(); bindDragHandle(); };
+    if (toggle) {
+      const doToggle = () => { S.listCollapsed = !S.listCollapsed; s1(); bindDragHandle(); };
+      toggle.onclick = doToggle;
+      toggle.addEventListener("touchend", (e) => { e.preventDefault(); doToggle(); }, { passive: false });
+    }
   }
 
   /* ---- S2 Body (Market Detail) ---- */
